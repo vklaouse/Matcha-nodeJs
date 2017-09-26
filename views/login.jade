@@ -1,0 +1,25 @@
+extends layout
+
+block layout
+block content
+	div(class='buttons-top-right')
+		a(class="ui inverted purple button" href="/subscribe") Inscription
+	div(class="ui middle aligned center aligned grid little")
+		div(class="column")
+			h2(class="ui text-color image header")
+				div(class="content")
+					| Connexion
+			form(class="ui large form" id='login')
+				div(class="ui stacked segment")
+					div(class="field")
+						div(class="ui left icon input")
+							i(class="mail icon")
+							input(type="text" name="mail" placeholder="E-mail address")
+					div(class="field")
+						div(class="ui left icon input")
+							i(class="lock icon")
+							input(type="password" name="password" placeholder="Mot de passe")
+					input(type="submit" class="ui fluid large inverted purple submit button" id="login-submit" value="Connexion")
+				div(class="ui error message err-message")
+			div(class="ui message")
+				a(href="/forget") Mot de passe oublié ?

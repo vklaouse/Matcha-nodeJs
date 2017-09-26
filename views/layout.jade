@@ -1,0 +1,24 @@
+doctype html
+html
+	head
+		title Matcha
+		meta(name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0")
+		link(rel='stylesheet', href='/libs/semantic-ui/dist/semantic.min.css')
+		link(rel='stylesheet', href="/libs/dropzone/min/dropzone.min.css")
+		link(rel='stylesheet', href='/stylesheets/style.css')
+		script(type='text/javascript' src='/libs/jquery/jquery.min.js')
+		script(type='text/javascript' src='/libs/semantic-ui/dist/semantic.min.js')
+		script(src="/libs/dropzone/dropzone.js")
+		script(type='text/javascript' src='/libs/turbolinks/turbolinks.min.js' data-turbolinks-eval='false')
+		script(type='text/javascript' src='/javascripts/main.js' data-turbolinks-eval='false')
+	body
+		block layout
+			div(class="ui large top fixed menu violet-bg transition visible" style="display: flex !important; position:inherit !important;")
+				div(class="ui container")
+					a(class="white-color item" href='/home') Acceuil
+					a(class="item white-color" href='/profile') Profil
+					a(class="item white-color" href='/editProfile') Compte
+					div(class="right menu")
+						div(class="item")
+							a(class="ui inverted button" href='/logout') Deconnexion
+		block content

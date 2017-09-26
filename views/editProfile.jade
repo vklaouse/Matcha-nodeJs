@@ -1,0 +1,38 @@
+extends layout
+
+block content
+	div
+		div(class="ui two column doubling stackable grid container")
+			div(class="column" id='dropzone')
+				form(action='/photo' class="dropzone" enctype="multipart/form-data" id="myAwesomeDropzone")
+					div(class="dz-default dz-message")
+						span Photo
+			div(class="column" id='user-images')
+		div(class="ui one column doubling stackable grid container")
+			div(class="column" style='max-width: 100% !important;')
+				form(action='/editProfile' class="ui form")
+					div(class="field")
+						label Name
+						div(class="four fields")
+							div(class="field")
+								input(type="text" name="shipping[first-name]" placeholder="First Name")
+							div(class="field")
+								input(type="text" name="shipping[last-name]" placeholder="Last Name")
+							div(class="field")
+								input(type="text" name="shipping[first-name]" placeholder="First Name")
+							div(class="field")
+								input(type="text" name="shipping[last-name]" placeholder="Last Name")
+						label Name
+						div(class="four fields")
+							div(class="field")
+								input(type="text" name="shipping[first-name]" placeholder="First Name")
+							div(class="field")
+								input(type="text" name="shipping[last-name]" placeholder="Last Name")
+							div(class="field")
+								input(type="text" name="shipping[first-name]" placeholder="First Name")
+							div(class="field")
+								input(type="text" name="shipping[last-name]" placeholder="Last Name")
+					div(class="field")
+						label Biographie
+						textarea
+

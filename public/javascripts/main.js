@@ -1,0 +1,307 @@
+$(document).ready(function(){
+
+	/*
+	** Jquery plugins
+	*/
+
+	// Check if the js modif is done or not.
+	$.fn.idempotent = function(){
+		if (!this.attr('data-appended')){
+			this.attr('data-appended', 'true')
+			return 1;
+		}
+		return 0;
+	}
+
+	// Add class 'error' to an input invalid and display an error message.
+	$.fn.invalidInput = function(err){
+		var $this = $(this);
+
+		$this.addClass('invalid-input');
+		$this.parents().addClass('error');
+		$this.val('');
+		$('.err-message').append('<ul class="list invalid-input-msg">'
+									+ '<li>'+ err +'</li>'
+								+ '</ul>');
+	}
+
+	/*
+	** Tools
+	*/
+
+	var isAlphaNum = function(string){
+		if (string){
+			var regAlphaNum = new RegExp('^[ ?!\,\.0-9a-z\_\-]+$','i');
+			return regAlphaNum.test(string);
+		}
+		return 0;
+	}
+
+	var getAge = function(date){
+		if (date){
+			date = new Date(date);
+			var today = new Date();
+			var years = today.getFullYear() - date.getFullYear();
+			var months = today.getMonth() - date.getMonth();
+			var days = today.getDate() - date.getDate();
+			if (years > 18 || (years == 18 && months >= 0 && days >= 0))
+				return years;
+		}
+		return 0;
+	}
+	var isMail = function(mail){
+		if (mail){
+			var regMail = new RegExp('^[0-9a-z.\_\-]+@{1}[0-9a-z.-]{2,}[.]{1}[a-z]{2,5}$','i');
+			return regMail.test(mail);
+		}
+		return 0;
+	}
+
+	/*
+	** Subscribe.js
+	*/
+
+	// Check the content of every inputs of the subscribtion form. 
+	var subscribeFormIsValid = function (data){
+		$('.invalid-input-msg').remove();
+		$('#subscribe input').removeClass('invalid-input');
+		$('.error').removeClass('error');
+		$('.err-message').addClass('error');
+		if (!isAlphaNum(data.login))
+			$('input[name="login"]').invalidInput('Login invalide.');
+		if (!isAlphaNum(data.name))
+			$('input[name="name"]').invalidInput('Nom invalide.');
+		if (!isAlphaNum(data.first_name))
+			$('input[name="first_name"]').invalidInput('Prenom invalide.');
+		if (!getAge(data.birth))
+			$('input[name="birth"]').invalidInput('Vous devez etre majeur.');
+		if (!isMail(data.mail) || data.mail != data.mail_confirm){
+			$('input[name="mail"]').invalidInput('Mail invalide.');
+			$('input[name="mail_confirm"]').invalidInput('Mail invalide.');
+		}
+		if (!isAlphaNum(data.password) || data.password != data.password_confirm 
+			|| data.password.length < 7){
+			$('input[name="password"]').invalidInput('Mot de passe invalide.');
+			$('input[name="password_confirm"]').invalidInput('Mot de passe invalide.');
+		}
+	}
+
+	// Get and ajax the form subscribe.
+	var subscribe = function () {
+		$('#subscribe-submit').off('click').on('click', function(e){
+			e.preventDefault();
+			var data = {
+				login: null, name: null, first_name: null, birth: null, mail: null,
+				mail_confirm: null, password: null, password_confirm: null
+			};
+			var $subscribeForm = $('#subscribe input');
+			var $loading = $('#subscribe .stacked');
+
+			$subscribeForm.each(function (){
+				data[this.name] = this.value;
+			});
+			subscribeFormIsValid(data);
+			if (!$subscribeForm.hasClass('invalid-input')){
+				$loading.addClass('loading');
+				$.ajax({
+					type : 'POST',
+					url : '/subscribe',
+					data : data,
+					dataType : 'json',
+					encode : true
+				}).done(function(response){
+					if (response.data == 'login' || response.data == 'mail')
+						$('input[name="'+ response.data +'"]').invalidInput('Déja utilisé.');
+					else if (response.status == 'fail')
+						subscribeFormIsValid(response.data);
+					else {
+						$('.success-message').fadeIn(700);
+						setTimeout(function(){
+							$('.success-message').fadeOut(700);
+						}, 2000);
+					}
+				}).always(function (){
+					$loading.removeClass('loading');
+				});
+			}
+		});
+	}
+
+	/*
+	** Login.js
+	*/
+
+	// Check the content of every inputs of the login form. 
+	var loginFormIsValid = function (data){
+		$('.invalid-input-msg').remove();
+		$('#login input').removeClass('invalid-input');
+		$('.error').removeClass('error');
+		$('.err-message').addClass('error');
+		if (!isMail(data.mail))
+			$('input[name="mail"]').invalidInput('Mail invalide.');
+		if (!isAlphaNum(data.password))
+			$('input[name="password"]').invalidInput('Mot de passe invalide.');
+	}
+
+	// Get and ajax the form login.
+	var login = function () {
+		$('#login-submit').off('click').on('click', function(e){
+			e.preventDefault();
+			var data = { mail: null, password: null };
+			var $loginForm = $('#login input');
+			var $loading = $('#login .stacked');
+
+			$loginForm.each(function (){
+				data[this.name] = this.value;
+			});
+			loginFormIsValid(data);
+			if (!$loginForm.hasClass('invalid-input')){
+				$loading.addClass('loading');
+				$.ajax({
+					type : 'POST',
+					url : '/',
+					data : data,
+					dataType : 'json',
+					encode : true
+				}).done(function(response){
+					if (response.data == 'mail')
+						$('input[name="'+ response.data +'"]').invalidInput('Mail inexistant.');
+					else if (response.data == 'password')
+						$('input[name="'+ response.data +'"]').invalidInput('Mauvais mot de passe.');
+					else if (response.status == 'fail')
+						loginFormIsValid(response.data);
+					else{
+						console.log('fuck2')
+						Turbolinks.visit('/home');
+					}
+				}).always(function (){
+					$loading.removeClass('loading');
+				});
+			}
+		});
+	}
+
+	/*
+	** mdpForget.js
+	*/
+
+	// Check the content of every inputs of the mdp forget form. 
+	var mdpForgetFormIsValid = function (data){
+		$('.invalid-input-msg').remove();
+		$('#mdp-forget input').removeClass('invalid-input');
+		$('.error').removeClass('error');
+		$('.err-message').addClass('error');
+		if (!isMail(data.mail))
+			$('input[name="mail"]').invalidInput('Mail invalide.');
+	}
+
+	// Get and ajax the form password rescue.
+	var mdpForget = function () {
+		$('#mdp-forget-submit').off('click').on('click', function(e){
+			e.preventDefault();
+			var data = { mail: null };
+			var $mdpFrogetForm = $('#mdp-forget input');
+			var $loading = $('#mdp-forget .stacked');
+
+			$mdpFrogetForm.each(function (){
+				data[this.name] = this.value;
+			});
+			mdpForgetFormIsValid(data);
+			if (!$mdpFrogetForm.hasClass('invalid-input')){
+				$loading.addClass('loading');
+				$.ajax({
+					type : 'POST',
+					url : '/forget',
+					data : data,
+					dataType : 'json',
+					encode : true
+				}).done(function(response){
+					if (response.data == 'mail')
+						$('input[name="'+ response.data +'"]').invalidInput('Mail inexistant.');
+					else if (response.status == 'fail')
+						mdpForgetFormIsValid(response.data);
+					else
+						$('.success-message').fadeIn(700);
+						setTimeout(function(){
+							$('.success-message').fadeOut(700);
+						}, 3000);
+				}).always(function (){
+					$loading.removeClass('loading');
+				});
+			}
+		});
+	}	
+
+	/*
+	** editProfile.js
+	*/
+
+	var getExtension = function (filename){
+		var parts = filename.split(".");
+		return (parts[(parts.length - 1)]);
+	}
+
+	// init dropzone
+	var DropzoneReady = function (option) {
+		if (!option){
+			console.log('fuck')
+			Turbolinks.visit('editProfile');
+			return ;
+		}
+		Dropzone.autoDiscover = false;
+		var options = {
+			autoProcessQueue: true,
+			uploadMultiple: false,
+			parallelUploads: 5,
+			maxFiles: 5,
+			paramName: "file",
+			maxFilesize: 5, // MB
+			url: '/photo',
+			accept: function(file, done) {
+				console.log('test')
+				var extension = getExtension(file.name);
+				if (extension == "jpg" || extension == "png" || extension == "jpeg")
+					done();
+				else
+					done("Veuillez mettre un fichier .jpeg, .jpg ou .png.");
+			},
+			init: function () { // Dropzone settings
+				var myDropzone = this;
+				console.log('22')
+				myDropzone.on("success", function (files, response) {
+					console.log(files, response)
+					if (response.status == 'success')
+						$('#user-images').append('<img class="img-list" src="'
+							+ response.data.path +'">');
+					else
+						console.log('stop connard');
+				});
+				myDropzone.on('complete', function(file, response) {
+					$('#filterrific_filter').trigger('submit');
+					setTimeout(function(){
+						myDropzone.removeFile(file);
+					}, 3000);
+					
+				});
+			}
+		}
+		Dropzone.options.myAwesomeDropzone = options;
+		Dropzone.discover();
+	}
+
+	/*
+	**
+	*/
+
+	subscribe();
+	login();
+	mdpForget();
+	DropzoneReady();
+
+	$(document).off('turbolinks:load').on('turbolinks:load', function (){
+		subscribe();
+		login();
+		mdpForget();
+		DropzoneReady('load');
+	});
+});

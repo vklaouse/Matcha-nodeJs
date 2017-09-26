@@ -1,0 +1,21 @@
+extends layout
+
+block layout
+block content
+	div(class='buttons-top-right')
+		a(class="ui inverted purple button" href="/") Connexion
+	div(class="ui middle aligned center aligned grid little")
+		div(class="column")
+			h2(class="ui text-color image header")
+				div(class="content")
+					| Restauration de mot de passe
+			form(class="ui large form" id='mdp-forget')
+				div(class="ui stacked segment")
+					div(class="field")
+						div(class="ui left icon input")
+							i(class="mail icon")
+							input(type="text" name="mail" placeholder="E-mail adresse")
+					input(type='submit' class="ui fluid large inverted purple submit button" id='mdp-forget-submit' value='Restaurer')
+				div(class="ui error message err-message")
+				div(class="ui success message success-message" )
+					p Vous allez recevoir un nouveau mot de passe sur votre boite mail.
