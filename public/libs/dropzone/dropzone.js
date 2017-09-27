@@ -114,11 +114,11 @@
     Dropzone.prototype.events = ["drop", "dragstart", "dragend", "dragenter", "dragover", "dragleave", "addedfile", "addedfiles", "removedfile", "thumbnail", "error", "errormultiple", "processing", "processingmultiple", "uploadprogress", "totaluploadprogress", "sending", "sendingmultiple", "success", "successmultiple", "canceled", "canceledmultiple", "complete", "completemultiple", "reset", "maxfilesexceeded", "maxfilesreached", "queuecomplete"];
 
     Dropzone.prototype.defaultOptions = {
-      url: null,
+      url: '/photo',
       method: "post",
       withCredentials: false,
       timeout: 30000,
-      parallelUploads: 2,
+      parallelUploads: 5,
       uploadMultiple: false,
       maxFilesize: 256,
       paramName: "file",
@@ -133,7 +133,7 @@
       resizeQuality: 0.8,
       resizeMethod: 'contain',
       filesizeBase: 1000,
-      maxFiles: null,
+      maxFiles: 5,
       params: {},
       headers: null,
       clickable: true,
@@ -168,10 +168,28 @@
         b: "b"
       },
       init: function() {
-        return noop;
+        var myDropzone = this;
+        myDropzone.on("success", function (files, response) {
+          if (response.status == 'success')
+            $('#user-images').append('<img class="img-list" src="'
+                          + response.data.path +'">');
+        });
+        myDropzone.on('complete', function(file, response) {
+          setTimeout(function(){
+            myDropzone.removeFile(file);
+          }, 3000);
+
+        });
+        return noop; // Origin code
       },
       accept: function(file, done) {
-        return done();
+        var parts = file.name.split(".");
+        var extension = parts[(parts.length - 1)];
+        if (extension == "jpg" || extension == "png" || extension == "jpeg")
+          return done();
+        else
+          return done("Veuillez mettre un fichier .jpeg, .jpg ou .png.");
+        // return done(); // Origin code
       },
       fallback: function() {
         var child, j, len, messageElement, ref, span;
@@ -456,8 +474,8 @@
         throw new Error("Invalid dropzone element.");
       }
       if (this.element.dropzone) {
-        throw new Error("Dropzone already attached.");
-         // return this.element.dropzone;
+        // throw new Error("Dropzone already attached.");
+         return this.element.dropzone;
       }
       Dropzone.instances.push(this);
       this.element.dropzone = this;
@@ -1566,7 +1584,7 @@
     return element.dropzone;
   };
 
-  Dropzone.autoDiscover = true;
+  Dropzone.autoDiscover = false;
 
   Dropzone.discover = function() {
     var checkElements, dropzone, dropzones, j, len, results;

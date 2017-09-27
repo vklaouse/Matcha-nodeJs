@@ -35,14 +35,13 @@ module.exports = {
 				else
 					throw 'Too much images';
 			}).then(function(){
-				fs.writeFile(filename, fd);
+				fs.writeFile(filename, fd, function(err){});
 				var data = {
 					status : 'success',
 					data : {'path': params.path}
 				};
 				res.send(data);
 			}).catch(function(err){
-				console.log(err)
 				var data = {
 					status : 'fail',
 					data : err

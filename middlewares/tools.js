@@ -2,7 +2,7 @@ const bcrypt = require('bcrypt');
 
 module.exports = {
 	isNotLog: function (req, res, next){
-		console.log('isNotLog', req.session)
+		// console.log('isNotLog', req.session)
 		if (req.session.login && req.session.uId){
 			res.redirect('/home');
 		}
@@ -10,7 +10,7 @@ module.exports = {
 			next();
 	},
 	isLog: function (req, res, next){
-		console.log('isLog', req.session);
+		// console.log('isLog', req.session);
 		if (req.session.login && req.session.uId)
 			next();
 		else

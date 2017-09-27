@@ -170,10 +170,8 @@ $(document).ready(function(){
 						$('input[name="'+ response.data +'"]').invalidInput('Mauvais mot de passe.');
 					else if (response.status == 'fail')
 						loginFormIsValid(response.data);
-					else{
-						console.log('fuck2')
+					else
 						Turbolinks.visit('/home');
-					}
 				}).always(function (){
 					$loading.removeClass('loading');
 				});
@@ -236,58 +234,6 @@ $(document).ready(function(){
 	** editProfile.js
 	*/
 
-	var getExtension = function (filename){
-		var parts = filename.split(".");
-		return (parts[(parts.length - 1)]);
-	}
-
-	// init dropzone
-	var DropzoneReady = function (option) {
-		if (!option){
-			console.log('fuck')
-			Turbolinks.visit('editProfile');
-			return ;
-		}
-		Dropzone.autoDiscover = false;
-		var options = {
-			autoProcessQueue: true,
-			uploadMultiple: false,
-			parallelUploads: 5,
-			maxFiles: 5,
-			paramName: "file",
-			maxFilesize: 5, // MB
-			url: '/photo',
-			accept: function(file, done) {
-				console.log('test')
-				var extension = getExtension(file.name);
-				if (extension == "jpg" || extension == "png" || extension == "jpeg")
-					done();
-				else
-					done("Veuillez mettre un fichier .jpeg, .jpg ou .png.");
-			},
-			init: function () { // Dropzone settings
-				var myDropzone = this;
-				console.log('22')
-				myDropzone.on("success", function (files, response) {
-					console.log(files, response)
-					if (response.status == 'success')
-						$('#user-images').append('<img class="img-list" src="'
-							+ response.data.path +'">');
-					else
-						console.log('stop connard');
-				});
-				myDropzone.on('complete', function(file, response) {
-					$('#filterrific_filter').trigger('submit');
-					setTimeout(function(){
-						myDropzone.removeFile(file);
-					}, 3000);
-					
-				});
-			}
-		}
-		Dropzone.options.myAwesomeDropzone = options;
-		Dropzone.discover();
-	}
 
 	/*
 	**
@@ -296,12 +242,12 @@ $(document).ready(function(){
 	subscribe();
 	login();
 	mdpForget();
-	DropzoneReady();
+	Dropzone.discover();
 
 	$(document).off('turbolinks:load').on('turbolinks:load', function (){
 		subscribe();
 		login();
 		mdpForget();
-		DropzoneReady('load');
+		Dropzone.discover();
 	});
 });
