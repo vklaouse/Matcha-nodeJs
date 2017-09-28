@@ -14,11 +14,6 @@ const multer = require('multer');
 module.exports = {
 	initRoutes: function(router){
 		var storage =   multer.memoryStorage();
-		// {
-		// 	destination: function (req, file, callback) {
-		// 		callback(null, './public/uploads');
-		// 	}
-		// });
 		const upload = multer({ storage: storage })
 
 		// Not login
@@ -35,6 +30,7 @@ module.exports = {
 		profile.get(router, tools.isLog);
 
 		editProfile.get(router, tools.isLog);
+		editProfile.post(router, tools.isLog);
 
 		photo.post(router, tools.isLog, upload.single('file'));
 

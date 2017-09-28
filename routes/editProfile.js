@@ -4,7 +4,12 @@ module.exports = {
 	get: function(router, isLog){
 		router.get('/editProfile', isLog, function(req, res, next) {
 			middleware.initEditUser(req, res);
-			res.render('editProfile');
+		});
+	},
+	post: function(router, isLog){
+
+		router.post('/editProfile', isLog, function(req, res, next) {
+			middleware.editUser(req, res);
 		});
 	}
 }

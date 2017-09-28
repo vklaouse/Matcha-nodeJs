@@ -1,38 +1,71 @@
 extends layout
 
 block content
-	div
-		div(class="ui two column doubling stackable grid container")
-			div(class="column" id='dropzone')
+	div(class='body-fixed-menu')
+		div(class="ui two column segment doubling stackable grid container" style="text-align:center;")
+			div(class="column center-div" id='dropzone')
 				form(action='/photo' class="dropzone" enctype="multipart/form-data" id="myAwesomeDropzone")
-					div(class="dz-default dz-message")
+					div(class="dz-default dz-message" style="padding:15%;")
 						span Photo
-			div(class="column" id='user-images')
-		div(class="ui one column doubling stackable grid container")
+			div(class="column center-div" id='user-images')
+				- for (var i = 0; i < img.length; i++)
+					- if (img[i].path)
+						img(class='img-list' src='#{img[i].path}')
+		div(class="ui one segment column doubling stackable grid container")
 			div(class="column" style='max-width: 100% !important;')
-				form(action='/editProfile' class="ui form")
+				form(action='/editProfile' id='edit-profile-form' class="ui form")
 					div(class="field")
-						label Name
 						div(class="four fields")
 							div(class="field")
-								input(type="text" name="shipping[first-name]" placeholder="First Name")
+								label Nom :
+								input(type="text" name="name" placeholder="Nom" value='#{from.name}')
 							div(class="field")
-								input(type="text" name="shipping[last-name]" placeholder="Last Name")
+								label Prénom :
+								input(type="text" name="first_name" placeholder="Prénom" value='#{from.first_name}')
 							div(class="field")
-								input(type="text" name="shipping[first-name]" placeholder="First Name")
+								label Sexe :
+								div(class='ui fluid dropdown selection' tabindex="0")
+									select
+										option(value='') 
+										option(value='H') Homme
+										option(value='F') Femme
+									i(class="dropdown icon")
+									div(class="default text")
+									div(class="menu"  name='sex' id='sex' tabindex="-1")
+										div(class='item' data-value='')
+										div(class='item' data-value='H') Homme
+										div(class='item' data-value='F') Femme
 							div(class="field")
-								input(type="text" name="shipping[last-name]" placeholder="Last Name")
-						label Name
+								label Préférences :
+								div(class='ui fluid dropdown selection' tabindex="0")
+									select
+										option(value='B') Homme et Femme
+										option(value='H') Homme
+										option(value='F') Femme
+									i(class="dropdown icon")
+									div(class="default text")
+									div(class="menu" name='sex_pref' id='sex-pref' tabindex="-1")
+										div(class='item' data-value='B') Homme et Femme
+										div(class='item' data-value='H') Homme
+										div(class='item' data-value='F') Femme
 						div(class="four fields")
 							div(class="field")
-								input(type="text" name="shipping[first-name]" placeholder="First Name")
+								label Mail :
+								input(type="text" name="mail" placeholder="E-mail adresse" value='#{from.mail}')
 							div(class="field")
-								input(type="text" name="shipping[last-name]" placeholder="Last Name")
+								label Mail confirmation :
+								input(type="text" name="mail_confirm" placeholder="E-mail adresse confirmation" value='#{from.mail}')
 							div(class="field")
-								input(type="text" name="shipping[first-name]" placeholder="First Name")
+								label Mot de passe :
+								input(type="text" name="passwd" placeholder="Mot de passe" value='')
 							div(class="field")
-								input(type="text" name="shipping[last-name]" placeholder="Last Name")
+								label Mot de passe confirmation :
+								input(type="text" name="passwd_confirm" placeholder="Mot de passe confirmation" value='')
 					div(class="field")
-						label Biographie
-						textarea
+						label Biographie:
+						textarea(id='bio-edit') #{from.bio}
+					button(class="ui inverted blue button" id='edit-profile-submit' style='width: 100%')
+						i(class="save icon")
+						| Sauvegarder
+					div(class="ui error message err-message")
 

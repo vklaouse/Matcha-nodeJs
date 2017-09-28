@@ -43,9 +43,9 @@ body > .little {
 
 .dropzone {
 	font-family: Roboto, "Open Sans", sans-serif;
-    border: 2px dashed #9c27b0;
-    border-radius: 5px;
-    background: white;
+	border: 2px dashed #9c27b0;
+	border-radius: 5px;
+	background: white;
 }
 
 .img-list {
@@ -53,4 +53,12 @@ body > .little {
 	overflow: hidden;
 	width: 120px;
 	height: 120px;
+}
+
+.center-div{
+	margin:0 auto;
+}
+
+.body-fixed-menu {
+	padding-top: 4rem;
 }

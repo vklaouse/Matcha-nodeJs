@@ -9,7 +9,7 @@ module.exports = {
 			host: 'localhost',
 			port: 5432,
 			database: 'matcha',
-			user: 'vivineklaousen',
+			user: 'vklaouse',
 			password: 'vklaouse'
 		};
 		const pgp = require('pg-promise')(initOptions);

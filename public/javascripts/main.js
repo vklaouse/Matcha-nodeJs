@@ -14,11 +14,15 @@ $(document).ready(function(){
 	}
 
 	// Add class 'error' to an input invalid and display an error message.
-	$.fn.invalidInput = function(err){
+	$.fn.invalidInput = function(err, $form, direct = 0){
 		var $this = $(this);
-
 		$this.addClass('invalid-input');
-		$this.parents().addClass('error');
+		if (direct == 1){
+			$this.parent().addClass('error');
+			$form.addClass('error');
+		}
+		else
+			$this.parents().addClass('error');
 		$this.val('');
 		$('.err-message').append('<ul class="list invalid-input-msg">'
 									+ '<li>'+ err +'</li>'
@@ -55,6 +59,22 @@ $(document).ready(function(){
 			return regMail.test(mail);
 		}
 		return 0;
+	}
+
+	var getFormInfo = function($form, data){
+		$form.each(function (){
+			data[this.name] = this.value;
+		});
+		return data;
+	}
+
+	var getSelectInfo = function($select, data){
+		$select.each(function (){
+			var $this = $(this);
+			if ($this.hasClass('active') && $this.hasClass('selected'))
+				data[$this.parent().attr('name')] = $this.attr('data-value');
+		});
+		return data;
 	}
 
 	/*
@@ -234,20 +254,100 @@ $(document).ready(function(){
 	** editProfile.js
 	*/
 
+	var getMainPhoto = function (){
+
+	}
+
+	var delPhoto = function (){
+
+	}
+
+	var validEditProfileForm = function (data){
+		var $form = $('#edit-profile-form');
+		$('.invalid-input-msg').remove();
+		$('#edit-profile-form input').removeClass('invalid-input');
+		$('.error').removeClass('error');
+		$('.err-message').addClass('error');
+		console.log(data)
+		if (!isAlphaNum(data.name))
+			$('input[name="name"]').invalidInput('Nom invalide.', $form, 1);
+		if (!isAlphaNum(data.first_name))
+			$('input[name="first_name"]').invalidInput('Prenom invalide.', $form, 1);
+		if (!isMail(data.mail) || data.mail != data.mail_confirm){
+			$('input[name="mail"]').invalidInput('Mail invalide.', $form, 1);
+			$('input[name="mail_confirm"]').invalidInput('Mail invalide.', $form, 1);
+		}
+		console.log(isAlphaNum(data.passwd));
+		if ((isAlphaNum(data.passwd) == 0 && data.passwd.length != 0)
+			|| (isAlphaNum(data.passwd) == true && data.passwd != data.passwd_confirm) 
+			|| (isAlphaNum(data.passwd) == true && data.passwd.length < 7)){
+			$('input[name="passwd"]').invalidInput('Mot de passe invalide.', $form, 1);
+			$('input[name="passwd_confirm"]').invalidInput('Mot de passe invalide.', $form, 1);
+		}
+		if (data.sex != 'F' && data.sex != '' && data.sex != 'H')
+			$('div[name="sex"]').invalidInput('Sexe invalide.', $form, 1);
+		if (data.sex_pref != 'F' && data.sex_pref != 'B' && data.sex_pref != 'H')
+			$('div[name="sex_pref"]').invalidInput('Préférence invalide.', $form, 1);
+		if (data.bio.length > 500)
+			$('#bio-edit').invalidInput('Biographie trop longue.', $form, 1);
+	}
+
+	var editProfile = function (){
+		$('#edit-profile-submit').off('click').on('click', function (e){
+			e.preventDefault();
+			var $editProfileForm = $('#edit-profile-form input');
+			var $loading = $('#edit-profile-form');
+			var $sex = $('#sex .item');
+			var $sexPref = $('#sex-pref .item');
+			var data = {
+				mail: null, mail_confirm: null, name: null,
+				first_name: null, passwd: null, passwd_confirm: null,
+				sex: null, sex_pref: 'B', bio: $('#bio-edit')[0].value
+			}
+			data = getFormInfo($editProfileForm, data);
+			data = getSelectInfo($sex, data);
+			data = getSelectInfo($sexPref, data);
+			validEditProfileForm(data);
+			if (!$editProfileForm.hasClass('invalid-input') 
+				&& !$sex.hasClass('invalid-input') 
+				&& !$sexPref.hasClass('invalid-input')){
+				$loading.addClass('loading');
+				$.ajax({
+					type : 'POST',
+					url : '/editProfile',
+					data : data,
+					dataType : 'json',
+					encode : true
+				}).done(function(response){
+					console.log(response);
+				}).always(function (){
+					$loading.removeClass('loading');
+				});
+			}
+		});
+	}
 
 	/*
 	**
 	*/
 
+	$('.ui.dropdown').dropdown();
 	subscribe();
 	login();
 	mdpForget();
+	getMainPhoto();
+	delPhoto();
+	editProfile();
 	Dropzone.discover();
 
 	$(document).off('turbolinks:load').on('turbolinks:load', function (){
+		$('.ui.dropdown').dropdown();
 		subscribe();
 		login();
 		mdpForget();
+		getMainPhoto();
+		delPhoto();
+		editProfile();
 		Dropzone.discover();
 	});
 });
