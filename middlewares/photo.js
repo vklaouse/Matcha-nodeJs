@@ -4,8 +4,15 @@ const fileType = require('file-type');
 const uniqid = require('uniqid');
 
 module.exports = {
-	imgUpload: function(req, res)
-	{
+	saveMainImg: (req, res) => {
+		console.log(req.body)
+		res.send({r:1});
+	},
+	delImg: (req, res) => {
+		console.log(req.body)
+		res.send({r:1});
+	},
+	imgUpload: (req, res) => {
 		var querySave = `INSERT INTO images ("user", path)
 							values($(user), $(path))`;
 
@@ -29,19 +36,19 @@ module.exports = {
 				path: '/uploads/' + id + '.' + type.ext
 			};
 			req.db.any(queryCount, params)
-			.then(function(data){
+			.then((data) => {
 				if (data[0].nb_img <= 4)
 					return req.db.none(querySave, params);
 				else
 					throw 'Too much images';
-			}).then(function(){
-				fs.writeFile(filename, fd, function(err){});
+			}).then(() => {
+				fs.writeFile(filename, fd, (err) => {});
 				var data = {
 					status : 'success',
 					data : {'path': params.path}
 				};
 				res.send(data);
-			}).catch(function(err){
+			}).catch((err) => {
 				var data = {
 					status : 'fail',
 					data : err

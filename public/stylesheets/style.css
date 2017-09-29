@@ -49,10 +49,11 @@ body > .little {
 }
 
 .img-list {
-	border-radius: 20px;
-	overflow: hidden;
-	width: 120px;
-	height: 120px;
+	margin: 2%;
+	border: solid 1px #ebeff1;
+	width: 130px;
+	height: auto;
+	font-size: .92857143rem;
 }
 
 .center-div{
@@ -61,4 +62,12 @@ body > .little {
 
 .body-fixed-menu {
 	padding-top: 4rem;
+}
+
+.img-list:hover .img-button{
+	display: inline-flex !important;
+	position: absolute;
+	width: 100%;
+	margin-top: -36px;
+	margin-left: -64px
 }

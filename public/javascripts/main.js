@@ -130,6 +130,7 @@ $(document).ready(function(){
 					dataType : 'json',
 					encode : true
 				}).done(function(response){
+					$loading.removeClass('loading');
 					if (response.data == 'login' || response.data == 'mail')
 						$('input[name="'+ response.data +'"]').invalidInput('Déja utilisé.');
 					else if (response.status == 'fail')
@@ -184,6 +185,7 @@ $(document).ready(function(){
 					dataType : 'json',
 					encode : true
 				}).done(function(response){
+					$loading.removeClass('loading');
 					if (response.data == 'mail')
 						$('input[name="'+ response.data +'"]').invalidInput('Mail inexistant.');
 					else if (response.data == 'password')
@@ -234,6 +236,7 @@ $(document).ready(function(){
 					dataType : 'json',
 					encode : true
 				}).done(function(response){
+					$loading.removeClass('loading');
 					if (response.data == 'mail')
 						$('input[name="'+ response.data +'"]').invalidInput('Mail inexistant.');
 					else if (response.status == 'fail')
@@ -255,11 +258,47 @@ $(document).ready(function(){
 	*/
 
 	var getMainPhoto = function (){
+		$('.save-main-img').off('click').on('click', function (e) {
+			var $container =  $($(this).parents()[1]);
+			var $img = $($container[0].firstChild);
+			var data = {
+				src: $img.attr('src'),
+			};
+			$.ajax({
+				type : 'PATCH',
+				url : '/photo',
+				data : data,
+				dataType : 'json',
+				encode : true
+			}).done(function (response){
+				console.log(response);
+			}).always(function (){
 
+			});
+			console.log($img, $container);
+		});
 	}
 
 	var delPhoto = function (){
+		$('.del-img').off('click').on('click', function (e) {
+			var $container =  $($(this).parents()[1]);
+			var $img = $($container[0].firstChild);
+			var data = {
+				src: $img.attr('src'),
+			};
+			$.ajax({
+				type : 'DELETE',
+				url : '/photo',
+				data : data,
+				dataType : 'json',
+				encode : true
+			}).done(function (response){
+				console.log(response);
+			}).always(function (){
 
+			});
+			console.log($img, $container);
+		});
 	}
 
 	var validEditProfileForm = function (data){
@@ -319,7 +358,15 @@ $(document).ready(function(){
 					dataType : 'json',
 					encode : true
 				}).done(function(response){
-					console.log(response);
+					$loading.removeClass('loading');
+					if (response.status == 'success'){
+						$('.success-message').fadeIn(700);
+						setTimeout(function(){
+							$('.success-message').fadeOut(700);
+						}, 2000);
+					}
+					else
+						validEditProfileForm(response.data);
 				}).always(function (){
 					$loading.removeClass('loading');
 				});

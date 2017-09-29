@@ -1,14 +1,15 @@
-var express = require('express');
-var path = require('path');
-var favicon = require('serve-favicon');
-var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
-const request = require('request-promise');
-const db = require('./configurations/initDb.js').init();
-var session = require('./configurations/initSession.js').init();
-var mail = require('./configurations/initMail.js').init();
-var routes = require('./routes/mainRoutes.js');
-var app = express();
+let express = require('express');
+let path = require('path');
+let favicon = require('serve-favicon');
+let cookieParser = require('cookie-parser');
+let bodyParser = require('body-parser');
+let request = require('request-promise');
+let xssFilters = require('xss-filters');
+let db = require('./configurations/initDb.js').init();
+let session = require('./configurations/initSession.js').init();
+let mail = require('./configurations/initMail.js').init();
+let routes = require('./routes/mainRoutes.js');
+let app = express();
 
 // construct app
 app.use(favicon(path.join(__dirname, 'public', 'images/favicon.png')))
@@ -17,22 +18,21 @@ app.use(favicon(path.join(__dirname, 'public', 'images/favicon.png')))
 	.use(cookieParser())
 	.use(express.static(path.join(__dirname, 'public')))
 	.use(session)
-	.use(function(req, res, next) {
+	.use((req, res, next) => {
 		if (!req.localisation)
 			request('http://ip-api.io/api/json')
-				.then(function (response) {
+				.then(response => {
 					req.localisation = JSON.parse(response);
 					return next();
 				});
 	})
-	.use(function(req, res, next) {
+	.use((req, res, next) => {
 		if (!req.mail)
 			req.mail = mail;
-		return next();
-	})
-	.use(function(req, res, next) {
 		if (!req.db)
 			req.db = db;
+		if (!req.xssFilters)
+			req.xssFilters = xssFilters;
 		return next();
 	});
 

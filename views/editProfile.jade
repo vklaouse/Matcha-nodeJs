@@ -10,7 +10,14 @@ block content
 			div(class="column center-div" id='user-images')
 				- for (var i = 0; i < img.length; i++)
 					- if (img[i].path)
-						img(class='img-list' src='#{img[i].path}')
+						div(class="ui img-list image")
+							img(class='' src='#{img[i].path}')
+							div(class="ui buttons img-button" style='display: none')
+								button(class="ui button del-img")
+									i(class="trash outline icon")
+								div(class="or")
+								button(class="ui positive button save-main-img")
+									i(class="save icon")
 		div(class="ui one segment column doubling stackable grid container")
 			div(class="column" style='max-width: 100% !important;')
 				form(action='/editProfile' id='edit-profile-form' class="ui form")
@@ -26,9 +33,18 @@ block content
 								label Sexe :
 								div(class='ui fluid dropdown selection' tabindex="0")
 									select
-										option(value='') 
-										option(value='H') Homme
-										option(value='F') Femme
+										- if (from.sex == '')
+											option(value='')
+											option(value='H')
+											option(value='F')
+										- if (from.sex == 'H')
+											option(value='H')
+											option(value='F')
+											option(value='')
+										- if (from.sex == 'F')
+											option(value='F')
+											option(value='')
+											option(value='H')
 									i(class="dropdown icon")
 									div(class="default text")
 									div(class="menu"  name='sex' id='sex' tabindex="-1")
@@ -39,9 +55,18 @@ block content
 								label Préférences :
 								div(class='ui fluid dropdown selection' tabindex="0")
 									select
-										option(value='B') Homme et Femme
-										option(value='H') Homme
-										option(value='F') Femme
+										- if (from.sex_pref == 'F')
+											option(value='F')
+											option(value='H')
+											option(value='B')
+										- if (from.sex_pref == 'H')
+											option(value='H')
+											option(value='F')
+											option(value='B')
+										- if (from.sex_pref == 'B')
+											option(value='B')
+											option(value='F')
+											option(value='H')
 									i(class="dropdown icon")
 									div(class="default text")
 									div(class="menu" name='sex_pref' id='sex-pref' tabindex="-1")
@@ -68,4 +93,6 @@ block content
 						i(class="save icon")
 						| Sauvegarder
 					div(class="ui error message err-message")
+					div(class="ui success message success-message" )
+						| Vos informations ont été sauvegardé.
 

@@ -33,6 +33,8 @@ module.exports = {
 		editProfile.post(router, tools.isLog);
 
 		photo.post(router, tools.isLog, upload.single('file'));
+		photo.delete(router, tools.isLog);
+		photo.patch(router, tools.isLog);
 
 		home.get(router, tools.isLog);
 

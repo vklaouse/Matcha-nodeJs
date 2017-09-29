@@ -171,8 +171,18 @@
         var myDropzone = this;
         myDropzone.on("success", function (files, response) {
           if (response.status == 'success')
-            $('#user-images').append('<img class="img-list" src="'
-                          + response.data.path +'">');
+            $('#user-images').append('<div class="ui img-list image">'
+                                        + '<img src="' + response.data.path + '">'
+                                        + '<div class="ui buttons img-button" style="display: none">'
+                                          + '<button class="ui button del-img">'
+                                            + '<i class="trash outline icon"></i>'
+                                          + '</button>'
+                                          + '<div class="or"></div>'
+                                          + '<button class="ui positive button save-main-img">'
+                                            + '<i class="save icon"></i>'
+                                          + '</button>'
+                                        + '</div>'
+                                      + '</div>');
         });
         myDropzone.on('complete', function(file, response) {
           setTimeout(function(){
