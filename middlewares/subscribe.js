@@ -45,7 +45,6 @@ module.exports = {
 				$(sex), $(sex_pref), $(bio),
 				$(latitude), $(longitude), $(ip))
 			RETURNING id`;
-		console.log(req.body);
 		!req.body.longitude ? req.body.longitude = req.localisation.longitude : 0;
 		!req.body.latitude ? req.body.latitude = req.localisation.latitude : 0;
 		!req.body.ip ? req.body.ip = req.localisation.ip : 0;

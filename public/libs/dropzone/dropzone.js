@@ -118,7 +118,7 @@
       method: "post",
       withCredentials: false,
       timeout: 30000,
-      parallelUploads: 5,
+      parallelUploads: 1,
       uploadMultiple: false,
       maxFilesize: 256,
       paramName: "file",
@@ -183,12 +183,53 @@
                                           + '</button>'
                                         + '</div>'
                                       + '</div>');
+          else {
+            $('.dropzone  > .error').show();
+            setTimeout(function(){
+              $('.dropzone  > .error').hide();
+            }, 2500);
+          }
         });
         myDropzone.on('complete', function(file, response) {
           setTimeout(function(){
             myDropzone.removeFile(file);
           }, 3000);
-
+          $('.save-main-img').off('click').on('click', function (e) {
+            var $container =  $($(this).parents()[1]);
+            var $img = $($container[0].firstChild);
+            var data = {
+              src: $img.attr('src'),
+            };
+            $.ajax({
+              type : 'PATCH',
+              url : '/photo',
+              data : data,
+              dataType : 'json',
+              encode : true
+            }).done(function (response){
+              if (response.status == 'success') {
+                $('.img-main').removeClass('img-main');
+                $container.addClass('img-main');
+              }
+            }).always(function (){});
+          });
+          $('.del-img').off('click').on('click', function (e) {
+            var $container =  $($(this).parents()[1]);
+            var $img = $($container[0].firstChild);
+            var data = {
+              src: $img.attr('src'),
+            };
+            $.ajax({
+              type : 'DELETE',
+              url : '/photo',
+              data : data,
+              dataType : 'json',
+              encode : true
+            }).done(function (response){
+              if (response.status == 'success')
+                $container.remove();
+            }).always(function (){});
+          });
         });
         return noop; // Origin code
       },

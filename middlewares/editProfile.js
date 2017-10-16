@@ -3,7 +3,7 @@ const tools = require('./tools.js');
 module.exports = {
 	initEditUser: (req, res) => {
 		var query = 'SELECT first_name, name, sex, sex_pref, mail, bio, path, main FROM users'
-						+ ' LEFT JOIN images ON users.id=images.user WHERE users.id=$(uId)';
+						+ ' LEFT JOIN images ON users.id=images.user_id WHERE users.id=$(uId)';
 		req.db.many(query, req.session)
 		.then(data => {
 			var from = {
@@ -19,7 +19,6 @@ module.exports = {
 			}
 			res.render('editProfile', {from: from, img: img});
 		}).catch(err => {
-			console.log(err);
 			res.render('editProfile');
 		});
 
@@ -39,10 +38,12 @@ module.exports = {
 
 	},
 	saveModif: (req, res) => {
-		if (req.body.passwd)
+		if (req.body.passwd){
 			var query = `UPDATE users SET passwd=$(passwd), mail=$(mail), name=$(name),
 						first_name=$(first_name), sex=$(sex), sex_pref=$(sex_pref),
 						bio=$(bio) WHERE id=$(id)`;
+			req.body.passwd = tools.hashPasswd(req.body.passwd);
+		}
 		else 
 			var query = `UPDATE users SET mail=$(mail), name=$(name), first_name=$(first_name),
 						sex=$(sex), sex_pref=$(sex_pref), bio=$(bio) WHERE id=$(id)`;
@@ -56,11 +57,13 @@ module.exports = {
 				data: data
 			});
 		}).catch(err => {
-			console.log(err);
-			res.send({
-				status: 'fail',
-				data: err
-			});
+			var data = {};
+			if (err.constraint)
+				data = {
+					status : 'fail',
+					data : err.constraint.split('_')[1]
+				};
+			res.send(data);
 		});
 	},
 	editUser: (req, res) => {

@@ -4,20 +4,33 @@ block content
 	div(class='body-fixed-menu')
 		div(class="ui two column segment doubling stackable grid container" style="text-align:center;")
 			div(class="column center-div" id='dropzone')
-				form(action='/photo' class="dropzone" enctype="multipart/form-data" id="myAwesomeDropzone")
+				form(action='/photo' class="ui form dropzone" enctype="multipart/form-data" id="myAwesomeDropzone")
 					div(class="dz-default dz-message" style="padding:15%;")
 						span Photo
+					div(class="ui error message err-message")
+						ul(class="list invalid-input-msg")
+							li Vous avez déja 5 photos.
 			div(class="column center-div" id='user-images')
 				- for (var i = 0; i < img.length; i++)
 					- if (img[i].path)
-						div(class="ui img-list image")
-							img(class='' src='#{img[i].path}')
-							div(class="ui buttons img-button" style='display: none')
-								button(class="ui button del-img")
-									i(class="trash outline icon")
-								div(class="or")
-								button(class="ui positive button save-main-img")
-									i(class="save icon")
+						- if ( img[i].main)
+							div(class="ui img-main img-list image")
+								img(class='' src='#{img[i].path}')
+								div(class="ui buttons img-button" style='display: none')
+									button(class="ui button del-img")
+										i(class="trash outline icon")
+									div(class="or")
+									button(class="ui positive button save-main-img")
+										i(class="save icon")
+						- else
+							div(class="ui img-list image")
+								img(class='' src='#{img[i].path}')
+								div(class="ui buttons img-button" style='display: none')
+									button(class="ui button del-img")
+										i(class="trash outline icon")
+									div(class="or")
+									button(class="ui positive button save-main-img")
+										i(class="save icon")
 		div(class="ui one segment column doubling stackable grid container")
 			div(class="column" style='max-width: 100% !important;')
 				form(action='/editProfile' id='edit-profile-form' class="ui form")
@@ -82,10 +95,10 @@ block content
 								input(type="text" name="mail_confirm" placeholder="E-mail adresse confirmation" value='#{from.mail}')
 							div(class="field")
 								label Mot de passe :
-								input(type="text" name="passwd" placeholder="Mot de passe" value='')
+								input(type="password" name="passwd" placeholder="Mot de passe" value='')
 							div(class="field")
 								label Mot de passe confirmation :
-								input(type="text" name="passwd_confirm" placeholder="Mot de passe confirmation" value='')
+								input(type="password" name="passwd_confirm" placeholder="Mot de passe confirmation" value='')
 					div(class="field")
 						label Biographie:
 						textarea(id='bio-edit') #{from.bio}
@@ -95,4 +108,27 @@ block content
 					div(class="ui error message err-message")
 					div(class="ui success message success-message" )
 						| Vos informations ont été sauvegardé.
-
+		div(class="field")
+			div(class="ui one column segment doubling stackable grid container" style="text-align:center;")
+				input(type='text' name="tag" class='input-out-form' id='add-tag' placeholder="Nouveau tag")
+		div(class="field")
+			div(class="ui two column segment doubling stackable grid container" style="text-align:center;")
+				div(class="column center-div")
+					div(class="field" style='overflow-y:auto; max-height:300px; margin-top: 2%;')
+						table(class="ui purple table" id='my-tags' style='text-align:center')
+							thead
+								tr
+									th Mes tags
+									th Supprimer
+							tbody
+								tr
+									td Mes tags
+									td Supprimer
+				div(class="column center-div")
+					div(class="field" style='overflow-y:auto; max-height:300px; margin-top: 2%;')
+						table(class="ui purple table" id='global-tags' style='text-align:center')
+							thead
+								tr
+									th Tag
+									th Actif
+							tbody

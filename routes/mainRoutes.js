@@ -1,20 +1,21 @@
-var login = require('./login.js');
-var logout = require('./logout.js');
-var subscribe = require('./subscribe.js');
-var mdpForget = require('./mdpForget.js');
-var profile = require('./profile.js');
-var editProfile = require('./editProfile.js');
-var photo = require('./photo.js');
-var home = require('./home.js');
-var error = require('./error.js');
-var tools = require('../middlewares/tools.js');
-const multer = require('multer');
+let login = require('./login.js');
+let logout = require('./logout.js');
+let subscribe = require('./subscribe.js');
+let mdpForget = require('./mdpForget.js');
+let profile = require('./profile.js');
+let editProfile = require('./editProfile.js');
+let photo = require('./photo.js');
+let home = require('./home.js');
+let tag = require('./tag.js');
+let error = require('./error.js');
+let tools = require('../middlewares/tools.js');
+let multer = require('multer');
 
 
 module.exports = {
 	initRoutes: function(router){
-		var storage =   multer.memoryStorage();
-		const upload = multer({ storage: storage })
+		let storage =   multer.memoryStorage();
+		let upload = multer({ storage: storage })
 
 		// Not login
 		login.get(router, tools.isNotLog);
@@ -35,6 +36,8 @@ module.exports = {
 		photo.post(router, tools.isLog, upload.single('file'));
 		photo.delete(router, tools.isLog);
 		photo.patch(router, tools.isLog);
+
+		tag.post(router, tools.isLog);
 
 		home.get(router, tools.isLog);
 

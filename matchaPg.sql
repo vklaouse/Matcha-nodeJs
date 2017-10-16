@@ -21,10 +21,25 @@ CREATE TABLE users (
 );
 
 CREATE TABLE "images" (
-	"user" INT NOT NULL,
+	"user_id" INT NOT NULL,
 	"path" VARCHAR NOT NULL,
 	"main" BOOLEAN DEFAULT FALSE,
-	CONSTRAINT img_id FOREIGN KEY ("user") REFERENCES "users"("id") ON DELETE CASCADE
+	CONSTRAINT img_id FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE
 	) WITH (
 	OIDS=FALSE
+);
+
+CREATE TABLE "user_tags" (
+	"user_id" INT NOT NULL,
+	"tags" VARCHAR NOT NULL,
+	CONSTRAINT tag_id FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE
+	) WITH (
+	OIDS=FALSE
+);
+
+
+
+CREATE TABLE "tags" (
+	"id" SERIAL PRIMARY KEY,
+	"name" VARCHAR NOT NULL UNIQUE
 );

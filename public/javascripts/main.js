@@ -24,9 +24,10 @@ $(document).ready(function(){
 		else
 			$this.parents().addClass('error');
 		$this.val('');
-		$('.err-message').append('<ul class="list invalid-input-msg">'
-									+ '<li>'+ err +'</li>'
-								+ '</ul>');
+		if (err)
+			$('.err-message').append('<ul class="list invalid-input-msg">'
+										+ '<li>'+ err +'</li>'
+									+ '</ul>');
 	}
 
 	/*
@@ -97,12 +98,12 @@ $(document).ready(function(){
 			$('input[name="birth"]').invalidInput('Vous devez etre majeur.');
 		if (!isMail(data.mail) || data.mail != data.mail_confirm){
 			$('input[name="mail"]').invalidInput('Mail invalide.');
-			$('input[name="mail_confirm"]').invalidInput('Mail invalide.');
+			$('input[name="mail_confirm"]').invalidInput('');
 		}
 		if (!isAlphaNum(data.password) || data.password != data.password_confirm 
 			|| data.password.length < 7){
 			$('input[name="password"]').invalidInput('Mot de passe invalide.');
-			$('input[name="password_confirm"]').invalidInput('Mot de passe invalide.');
+			$('input[name="password_confirm"]').invalidInput('');
 		}
 	}
 
@@ -271,11 +272,11 @@ $(document).ready(function(){
 				dataType : 'json',
 				encode : true
 			}).done(function (response){
-				console.log(response);
-			}).always(function (){
-
-			});
-			console.log($img, $container);
+				if (response.status == 'success') {
+					$('.img-main').removeClass('img-main');
+					$container.addClass('img-main');
+				}
+			}).always(function (){});
 		});
 	}
 
@@ -293,16 +294,14 @@ $(document).ready(function(){
 				dataType : 'json',
 				encode : true
 			}).done(function (response){
-				console.log(response);
-			}).always(function (){
-
-			});
-			console.log($img, $container);
+				if (response.status == 'success') {
+					$container.remove();
+				}
+			}).always(function (){});
 		});
 	}
 
-	var validEditProfileForm = function (data){
-		var $form = $('#edit-profile-form');
+	var validEditProfileForm = function (data, $form){
 		$('.invalid-input-msg').remove();
 		$('#edit-profile-form input').removeClass('invalid-input');
 		$('.error').removeClass('error');
@@ -314,14 +313,14 @@ $(document).ready(function(){
 			$('input[name="first_name"]').invalidInput('Prenom invalide.', $form, 1);
 		if (!isMail(data.mail) || data.mail != data.mail_confirm){
 			$('input[name="mail"]').invalidInput('Mail invalide.', $form, 1);
-			$('input[name="mail_confirm"]').invalidInput('Mail invalide.', $form, 1);
+			$('input[name="mail_confirm"]').invalidInput('', $form, 1);
 		}
 		console.log(isAlphaNum(data.passwd));
 		if ((isAlphaNum(data.passwd) == 0 && data.passwd.length != 0)
 			|| (isAlphaNum(data.passwd) == true && data.passwd != data.passwd_confirm) 
 			|| (isAlphaNum(data.passwd) == true && data.passwd.length < 7)){
 			$('input[name="passwd"]').invalidInput('Mot de passe invalide.', $form, 1);
-			$('input[name="passwd_confirm"]').invalidInput('Mot de passe invalide.', $form, 1);
+			$('input[name="passwd_confirm"]').invalidInput('', $form, 1);
 		}
 		if (data.sex != 'F' && data.sex != '' && data.sex != 'H')
 			$('div[name="sex"]').invalidInput('Sexe invalide.', $form, 1);
@@ -334,6 +333,7 @@ $(document).ready(function(){
 	var editProfile = function (){
 		$('#edit-profile-submit').off('click').on('click', function (e){
 			e.preventDefault();
+			var $form = $('#edit-profile-form');
 			var $editProfileForm = $('#edit-profile-form input');
 			var $loading = $('#edit-profile-form');
 			var $sex = $('#sex .item');
@@ -346,7 +346,7 @@ $(document).ready(function(){
 			data = getFormInfo($editProfileForm, data);
 			data = getSelectInfo($sex, data);
 			data = getSelectInfo($sexPref, data);
-			validEditProfileForm(data);
+			validEditProfileForm(data, $form);
 			if (!$editProfileForm.hasClass('invalid-input') 
 				&& !$sex.hasClass('invalid-input') 
 				&& !$sexPref.hasClass('invalid-input')){
@@ -359,7 +359,11 @@ $(document).ready(function(){
 					encode : true
 				}).done(function(response){
 					$loading.removeClass('loading');
-					if (response.status == 'success'){
+					if (response.data == 'mail'){
+						$('input[name="'+ response.data +'"]').invalidInput('Adresse E-mail déja utilisé.', $form, 1);
+						$('input[name="'+ response.data +'_confirm"]').invalidInput('', $form, 1);
+					}
+					else if (response.status == 'success'){
 						$('.success-message').fadeIn(700);
 						setTimeout(function(){
 							$('.success-message').fadeOut(700);
@@ -374,20 +378,45 @@ $(document).ready(function(){
 		});
 	}
 
+	var newTag = function(){
+		$('#add-tag').off('keyup').on('keyup', function(e){
+			var $this = $(this);
+			$this.removeClass('input-error-out-form');
+			if (e.keyCode == 13){
+				var tag = $this.val();
+				if (isAlphaNum(tag)){
+					$.ajax({
+						type : 'POST',
+						url : '/tag',
+						data : {tag: tag},
+						dataType : 'json',
+						encode : true
+					}).done(function(response){
+						console.log(response)
+					}).always(function (){});
+				}
+				else
+					$this.addClass('input-error-out-form');
+			}
+		});
+	}
+
+	var searchTag = function(){
+		$('#search-tag').off('keyup').on('keyup', function(e){
+			var $this = $(this);
+			console.log($this.val())
+		});
+	}
+
+	var activeTag = function() {
+
+	}
+
 	/*
 	**
 	*/
 
-	$('.ui.dropdown').dropdown();
-	subscribe();
-	login();
-	mdpForget();
-	getMainPhoto();
-	delPhoto();
-	editProfile();
-	Dropzone.discover();
-
-	$(document).off('turbolinks:load').on('turbolinks:load', function (){
+	var runAllJs = function() {
 		$('.ui.dropdown').dropdown();
 		subscribe();
 		login();
@@ -396,5 +425,14 @@ $(document).ready(function(){
 		delPhoto();
 		editProfile();
 		Dropzone.discover();
+		newTag();
+		searchTag();
+		activeTag();
+	}
+
+	runAllJs();
+
+	$(document).off('turbolinks:load').on('turbolinks:load', function (){
+		runAllJs();
 	});
 });

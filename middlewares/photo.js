@@ -5,20 +5,44 @@ const uniqid = require('uniqid');
 
 module.exports = {
 	saveMainImg: (req, res) => {
-		console.log(req.body)
-		res.send({r:1});
+		var query = 'UPDATE images SET main = (CASE path WHEN $(src) THEN '+ true +' ELSE '+ false +' END) WHERE images.user_id=$(uId)';
+		req.body.src = req.xssFilters.inHTMLData(req.body.src);
+		req.body.uId = req.session.uId;
+		req.db.any(query, req.body)
+		.then((data) => {
+			res.send({
+				status: 'success',
+			});
+		}).catch((err) => {
+			res.send({
+				status: 'fail',
+				data: err
+			});
+		});
 	},
 	delImg: (req, res) => {
-		console.log(req.body)
-		res.send({r:1});
+		var query = 'DELETE FROM images WHERE images.path=$(src) AND images.user_id=$(uId)';
+		req.body.src = req.xssFilters.inHTMLData(req.body.src);
+		req.body.uId = req.session.uId;
+		req.db.any(query, req.body)
+		.then((data) => {
+			res.send({
+				status: 'success',
+			});
+		}).catch((err) => {
+			res.send({
+				status: 'fail',
+				data: err
+			});
+		});
 	},
 	imgUpload: (req, res) => {
-		var querySave = `INSERT INTO images ("user", path)
+		var querySave = `INSERT INTO images ("user_id", path)
 							values($(user), $(path))`;
 
 		var queryCount = `SELECT COUNT(*) AS nb_img
 							FROM images
-							WHERE "user"=$(user)`;
+							WHERE "user_id"=$(user)`;
 
 		var allowed = ['jpg', 'jpeg', 'png'];
 		if (typeof(req.file.buffer) !== 'undefined'){
