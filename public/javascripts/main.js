@@ -393,7 +393,30 @@ $(document).ready(function(){
 						encode : true
 					}).done(function(response){
 						console.log(response)
-					}).always(function (){});
+						var $myTags = $('#my-tags tbody');
+						var $globalsTags = $('#global-tags tbody');
+						if (response.status == 'success-new-tag') {
+							$globalsTags.prepend('<tr>' 
+												+ '<td>#' + response.data + '</td>'
+												+ '<td><button><i class="trash outline icon">'
+												+ '</i></button></td>'
+												+ '</tr>');
+							$myTags.prepend('<tr>' 
+											+ '<td>#' + response.data + '</td>'
+											+ '<td><button><i class="trash outline icon">'
+											+ '</i></button></td>'
+											+ '</tr>');
+						}
+						else if (response.status == 'success-new-userTag') {
+							$myTags.prepend('<tr>' 
+											+ '<td>#' + response.data + '</td>'
+											+ '<td><button><i class="trash outline icon">'
+											+ '</i></button></td>'
+											+ '</tr>');
+						}
+					}).always(function (){
+						$('#add-tag').val('');
+					});
 				}
 				else
 					$this.addClass('input-error-out-form');

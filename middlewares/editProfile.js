@@ -2,10 +2,15 @@ const tools = require('./tools.js');
 
 module.exports = {
 	initEditUser: (req, res) => {
-		var query = 'SELECT first_name, name, sex, sex_pref, mail, bio, path, main FROM users'
-						+ ' LEFT JOIN images ON users.id=images.user_id WHERE users.id=$(uId)';
+		// var query = 'SELECT first_name, name, sex, sex_pref, mail, bio, path, main FROM users'
+						// + ' LEFT JOIN images ON users.id=images.user_id WHERE users.id=$(uId)';
+		var query = 'SELECT first_name, name, sex, sex_pref, mail, bio FROM users WHERE users.id=$(uId)'
+						+ ' UNION SELECT path, main, NULL as sex, NULL as sex_pref, NULL as mail, NULL as bio FROM images WHERE images.user_id=$(uId)';
+						// + ' LEFT JOIN tags '
+						// + ' UNION SELECT * FROM user_tags WHERE user_tags.user_id=$(uId)';
 		req.db.many(query, req.session)
 		.then(data => {
+			console.log(data);
 			var from = {
 				first_name: data[0].first_name, name: data[0].name,
 				sex: data[0].sex, sex_pref: data[0].sex_pref,
@@ -19,6 +24,7 @@ module.exports = {
 			}
 			res.render('editProfile', {from: from, img: img});
 		}).catch(err => {
+			console.log(err)
 			res.render('editProfile');
 		});
 
