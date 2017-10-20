@@ -378,61 +378,65 @@ $(document).ready(function(){
 		});
 	}
 
+	var registerTags = function($this) {
+		var tag = $this.val();
+		if (isAlphaNum(tag)){
+			$.ajax({
+				type : 'POST',
+				url : '/tag',
+				data : {tag: tag},
+				dataType : 'json',
+				encode : true
+			}).done(function(response){
+				var $myTags = $('#my-tags tbody');
+				var $globalsTags = $('#global-tags tbody');
+				if (response.status == 'success-new-tag') {
+					$globalsTags.prepend('<tr>' 
+										+ '<td><a href="#">#' + response.data + '</a></td>'
+										+ '</tr>');
+					$myTags.prepend('<tr>' 
+									+ '<td><a href="#">#' + response.data + '</a></td>'
+									+ '<td><button class="circular ui icon button del-tag"><i class="trash outline icon">'
+									+ '</i></button></td>'
+									+ '</tr>');
+				}
+				else if (response.status == 'success-new-userTag')
+					$myTags.prepend('<tr>' 
+									+ '<td><a href="#">#' + response.data + '</a></td>'
+									+ '<td><button class="ui button del-tag"><i class="trash outline icon">'
+									+ '</i></button></td>'
+									+ '</tr>');
+			}).always(function (){
+				$('#add-tag').val('');
+			});
+		}
+		else
+			$this.addClass('input-error-out-form');
+	}
+
+	var searchTags = function($this) {
+		var $myTags = $('#my-tags tbody a');
+		var $globalsTags = $('#global-tags tbody a');
+		var regex = new RegExp($this.val() + `.*`);
+		$myTags.each(function () {
+			console.log(regex);
+			console.log(this.text.search(regex));
+			console.log(regex.test(this.text));
+		});
+		$globalsTags.each(function () {
+			this.text
+		});
+	}
+
 	var newTag = function(){
 		$('#add-tag').off('keyup').on('keyup', function(e){
 			var $this = $(this);
 			$this.removeClass('input-error-out-form');
-			if (e.keyCode == 13){
-				var tag = $this.val();
-				if (isAlphaNum(tag)){
-					$.ajax({
-						type : 'POST',
-						url : '/tag',
-						data : {tag: tag},
-						dataType : 'json',
-						encode : true
-					}).done(function(response){
-						console.log(response)
-						var $myTags = $('#my-tags tbody');
-						var $globalsTags = $('#global-tags tbody');
-						if (response.status == 'success-new-tag') {
-							$globalsTags.prepend('<tr>' 
-												+ '<td>#' + response.data + '</td>'
-												+ '<td><button><i class="trash outline icon">'
-												+ '</i></button></td>'
-												+ '</tr>');
-							$myTags.prepend('<tr>' 
-											+ '<td>#' + response.data + '</td>'
-											+ '<td><button><i class="trash outline icon">'
-											+ '</i></button></td>'
-											+ '</tr>');
-						}
-						else if (response.status == 'success-new-userTag') {
-							$myTags.prepend('<tr>' 
-											+ '<td>#' + response.data + '</td>'
-											+ '<td><button><i class="trash outline icon">'
-											+ '</i></button></td>'
-											+ '</tr>');
-						}
-					}).always(function (){
-						$('#add-tag').val('');
-					});
-				}
-				else
-					$this.addClass('input-error-out-form');
-			}
+			if (e.keyCode == 13)
+				registerTags($this);
+			else
+				searchTags($this);
 		});
-	}
-
-	var searchTag = function(){
-		$('#search-tag').off('keyup').on('keyup', function(e){
-			var $this = $(this);
-			console.log($this.val())
-		});
-	}
-
-	var activeTag = function() {
-
 	}
 
 	/*
@@ -449,8 +453,6 @@ $(document).ready(function(){
 		editProfile();
 		Dropzone.discover();
 		newTag();
-		searchTag();
-		activeTag();
 	}
 
 	runAllJs();

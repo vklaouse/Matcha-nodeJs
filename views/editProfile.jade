@@ -109,7 +109,7 @@ block content
 					div(class="ui success message success-message" )
 						| Vos informations ont été sauvegardé.
 		div(class="field")
-			div(class="ui one column segment doubling stackable grid container" style="text-align:center;")
+			div(class="ui two column segment doubling stackable grid container" style="text-align:center;")
 				input(type='text' name="tag" class='input-out-form' id='add-tag' placeholder="Nouveau tag")
 		div(class="field")
 			div(class="ui two column segment doubling stackable grid container" style="text-align:center;")
@@ -121,11 +121,23 @@ block content
 									th Mes tags
 									th Supprimer
 							tbody
+								- for (var i = 0; i < user_tags.length; i++)
+									- if (user_tags[i])
+										tr
+											td 
+												a(href="#") ##{user_tags[i]}
+											td 
+												button(class="circular ui icon button del-tag")
+													i(class="trash outline icon")
 				div(class="column center-div")
 					div(class="field" style='overflow-y:auto; max-height:300px; margin-top: 2%;')
 						table(class="ui purple table" id='global-tags' style='text-align:center')
 							thead
 								tr
 									th Tags
-									th Actif
 							tbody
+								- for (var i = 0; i < tags.length; i++)
+										- if (tags[i])
+											tr
+												td 
+													a(href="#") ##{tags[i]}

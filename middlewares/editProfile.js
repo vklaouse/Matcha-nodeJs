@@ -2,27 +2,42 @@ const tools = require('./tools.js');
 
 module.exports = {
 	initEditUser: (req, res) => {
-		// var query = 'SELECT first_name, name, sex, sex_pref, mail, bio, path, main FROM users'
-						// + ' LEFT JOIN images ON users.id=images.user_id WHERE users.id=$(uId)';
-		var query = 'SELECT first_name, name, sex, sex_pref, mail, bio FROM users WHERE users.id=$(uId)'
-						+ ' UNION SELECT path, main, NULL as sex, NULL as sex_pref, NULL as mail, NULL as bio FROM images WHERE images.user_id=$(uId)';
-						// + ' LEFT JOIN tags '
-						// + ' UNION SELECT * FROM user_tags WHERE user_tags.user_id=$(uId)';
+		var query = 'SELECT first_name, name, sex, sex_pref, mail, bio, NULL as path, FALSE as main, NULL as user_tags, NULL as tags FROM users WHERE id=$(uId)'
+					+ ' UNION SELECT NULL, NULL, NULL, NULL, NULL, NULL, path, main, NULL, NULL FROM images WHERE user_id=$(uId)'
+					+ ' UNION SELECT NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, tags, NULL FROM user_tags WHERE user_id=$(uId)'
+					+ ' UNION SELECT NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, name FROM tags';
 		req.db.many(query, req.session)
 		.then(data => {
-			console.log(data);
 			var from = {
-				first_name: data[0].first_name, name: data[0].name,
-				sex: data[0].sex, sex_pref: data[0].sex_pref,
-				mail: data[0].mail, bio: data[0].bio
+				first_name: '', name: '',
+				sex: '', sex_pref: '',
+				mail: '', bio: ''
 			};
 			var img = [];
-			for (var i = 0; i < data.length; i++){
-				img[i] = {
-					path: data[i].path, main: data[i].main,
+			var tags = [];
+			var user_tags = []
+			for (var i = 1; i < data.length; i++){
+				if (data[i].tags) {
+					tags.push(data[i].tags);
 				}
+				else if (data[i].user_tags) {
+					user_tags.push(data[i].user_tags);
+				}
+				else if (data[i].path) {
+					img.push({
+						path: data[i].path, main: data[i].main,
+					});
+				}
+				else {
+					from = {
+						first_name: data[i].first_name, name: data[i].name,
+						sex: data[i].sex, sex_pref: data[i].sex_pref,
+						mail: data[i].mail, bio: data[i].bio
+					};
+				}
+				
 			}
-			res.render('editProfile', {from: from, img: img});
+			res.render('editProfile', {from: from, img: img, tags: tags, user_tags: user_tags});
 		}).catch(err => {
 			console.log(err)
 			res.render('editProfile');
