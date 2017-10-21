@@ -1,6 +1,12 @@
 $(document).ready(function(){
 
 	/*
+	** Globals variables 
+	*/
+
+	var globalsVar;
+
+	/*
 	** Jquery plugins
 	*/
 
@@ -33,6 +39,10 @@ $(document).ready(function(){
 	/*
 	** Tools
 	*/
+
+	var checkDoublonInArray = function(array, string) {
+		return $.inArray(string, array) < 0 ? 0 : 1;
+	}
 
 	var isAlphaNum = function(string){
 		if (string){
@@ -378,9 +388,20 @@ $(document).ready(function(){
 		});
 	}
 
+	var getAllTags = function() {
+		var $myTags = $('#my-tags tbody a');
+		var $globalsTags = $('#global-tags tbody a');
+		$myTags.each(function () {
+			globalsVar.userTags.push(this.text);
+		});
+		$globalsTags.each(function () {
+			globalsVar.tags.push(this.text);
+		});
+	}
+
 	var registerTags = function($this) {
 		var tag = $this.val();
-		if (isAlphaNum(tag)){
+		if (isAlphaNum(tag) && !checkDoublonInArray(globalsVar.userTags, `#`+ tag)){
 			$.ajax({
 				type : 'POST',
 				url : '/tag',
@@ -388,26 +409,15 @@ $(document).ready(function(){
 				dataType : 'json',
 				encode : true
 			}).done(function(response){
-				var $myTags = $('#my-tags tbody');
-				var $globalsTags = $('#global-tags tbody');
 				if (response.status == 'success-new-tag') {
-					$globalsTags.prepend('<tr>' 
-										+ '<td><a href="#">#' + response.data + '</a></td>'
-										+ '</tr>');
-					$myTags.prepend('<tr>' 
-									+ '<td><a href="#">#' + response.data + '</a></td>'
-									+ '<td><button class="circular ui icon button del-tag"><i class="trash outline icon">'
-									+ '</i></button></td>'
-									+ '</tr>');
+					globalsVar.userTags.push(`#` + response.data);
+					globalsVar.tags.push(`#` + response.data);
 				}
 				else if (response.status == 'success-new-userTag')
-					$myTags.prepend('<tr>' 
-									+ '<td><a href="#">#' + response.data + '</a></td>'
-									+ '<td><button class="ui button del-tag"><i class="trash outline icon">'
-									+ '</i></button></td>'
-									+ '</tr>');
+					globalsVar.userTags.push(`#` + response.data);
 			}).always(function (){
 				$('#add-tag').val('');
+				searchTags($this);
 			});
 		}
 		else
@@ -415,27 +425,68 @@ $(document).ready(function(){
 	}
 
 	var searchTags = function($this) {
-		var $myTags = $('#my-tags tbody a');
-		var $globalsTags = $('#global-tags tbody a');
-		var regex = new RegExp($this.val() + `.*`);
-		$myTags.each(function () {
-			console.log(regex);
-			console.log(this.text.search(regex));
-			console.log(regex.test(this.text));
-		});
-		$globalsTags.each(function () {
-			this.text
-		});
+		var $myTags = $('#my-tags tbody');
+		var $globalsTags = $('#global-tags tbody');
+		$myTags.empty();
+		$globalsTags.empty();
+		for (var i = 0; i < globalsVar.userTags.length; i++) {
+			if (~globalsVar.userTags[i].toLowerCase().indexOf($this.val().toLowerCase())) {
+				console.log('test');
+				var $tr = $(`<tr><td><a href="#">` + globalsVar.userTags[i] + `</a></td></tr>`);
+				var $tdButton = $(`<td></td>`);
+				var $button = $(`<button class="circular ui icon button del-tag"><i class="trash outline icon"></i></button>`);
+				$tdButton.append($button);
+				$tr.append($tdButton);
+				
+				$myTags.append($tr);
+				delTags($button);
+			}
+		}
+		for (var i = 0; i < globalsVar.tags.length; i++) {
+			if (~globalsVar.tags[i].toLowerCase().indexOf($this.val().toLowerCase())) {
+				$globalsTags.append(`<tr><td>`
+								+ `<a href="#">` + globalsVar.tags[i] + `</a>`
+								+ `</td></tr>`);
+				
+			}
+		}
 	}
 
 	var newTag = function(){
+		getAllTags();
+		var typingTimer;
 		$('#add-tag').off('keyup').on('keyup', function(e){
 			var $this = $(this);
 			$this.removeClass('input-error-out-form');
+			clearTimeout(typingTimer);
 			if (e.keyCode == 13)
 				registerTags($this);
 			else
-				searchTags($this);
+				typingTimer = setTimeout(function() {searchTags($this);}, 250);
+		});
+	}
+
+	var delTags = function($button) {
+		$button.off('click').on('click', function (e) {
+			var tag = $($($($(this).parents()[1]).children()[0]).children()[0])[0].text;
+			var tagStr;
+			if (checkDoublonInArray(globalsVar.userTags, tag)) {
+				tagStr = tag.substring(1, tag.length);
+				$.ajax({
+					type : 'DELETE',
+					url : '/tag',
+					data : {tag: tagStr},
+					dataType : 'json',
+					encode : true
+				}).done(function(response){
+					if (response.status == 'success') {
+						var index = globalsVar.userTags.indexOf('#'+ response.data);
+						globalsVar.userTags.splice(index, 1);
+					}
+				}).always(function (){
+					searchTags($(`#add-tag`));
+				});
+			}
 		});
 	}
 
@@ -444,6 +495,10 @@ $(document).ready(function(){
 	*/
 
 	var runAllJs = function() {
+		globalsVar = {
+			tags: [],
+			userTags: []
+		};
 		$('.ui.dropdown').dropdown();
 		subscribe();
 		login();
@@ -453,6 +508,7 @@ $(document).ready(function(){
 		editProfile();
 		Dropzone.discover();
 		newTag();
+		delTags($('.del-tag'))
 	}
 
 	runAllJs();

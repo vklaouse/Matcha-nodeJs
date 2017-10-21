@@ -46,5 +46,21 @@ module.exports = {
 				status: 'fail',
 				data: req.body
 			});
+	},
+	removeUserTag: (req, res) => {
+		var query = `DELETE FROM user_tags WHERE user_id=$(uId) AND tags=$(tag)`;
+		req.body.uId = req.session.uId;
+		req.db.none(query, req.body)
+		.then((response) => {
+			res.send({
+				status: 'success',
+				data: req.body.tag
+			});
+		}).catch((err) => {
+			res.send({
+				status: 'fail',
+				data: err
+			});
+		});
 	}
 }

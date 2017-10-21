@@ -2,21 +2,21 @@ const tools = require('./tools.js');
 
 module.exports = {
 	initEditUser: (req, res) => {
+		var from = {
+			first_name: '', name: '',
+			sex: '', sex_pref: '',
+			mail: '', bio: ''
+		};
+		var img = [];
+		var tags = [];
+		var user_tags = [];
 		var query = 'SELECT first_name, name, sex, sex_pref, mail, bio, NULL as path, FALSE as main, NULL as user_tags, NULL as tags FROM users WHERE id=$(uId)'
 					+ ' UNION SELECT NULL, NULL, NULL, NULL, NULL, NULL, path, main, NULL, NULL FROM images WHERE user_id=$(uId)'
 					+ ' UNION SELECT NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, tags, NULL FROM user_tags WHERE user_id=$(uId)'
 					+ ' UNION SELECT NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, name FROM tags';
 		req.db.many(query, req.session)
 		.then(data => {
-			var from = {
-				first_name: '', name: '',
-				sex: '', sex_pref: '',
-				mail: '', bio: ''
-			};
-			var img = [];
-			var tags = [];
-			var user_tags = []
-			for (var i = 1; i < data.length; i++){
+			for (var i = 0; i < data.length; i++){
 				if (data[i].tags) {
 					tags.push(data[i].tags);
 				}
@@ -39,8 +39,7 @@ module.exports = {
 			}
 			res.render('editProfile', {from: from, img: img, tags: tags, user_tags: user_tags});
 		}).catch(err => {
-			console.log(err)
-			res.render('editProfile');
+			res.render('editProfile', {from: from, img: img, tags: tags, user_tags: user_tags});
 		});
 
 	},

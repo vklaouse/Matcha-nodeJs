@@ -29,6 +29,7 @@ module.exports = {
 
 		// Login
 		profile.get(router, tools.isLog);
+		profile.getWithId(router, tools.isLog);
 
 		editProfile.get(router, tools.isLog);
 		editProfile.post(router, tools.isLog);
@@ -38,6 +39,7 @@ module.exports = {
 		photo.patch(router, tools.isLog);
 
 		tag.post(router, tools.isLog);
+		tag.delete(router, tools.isLog);
 
 		home.get(router, tools.isLog);
 
