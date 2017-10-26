@@ -5,6 +5,7 @@ $(document).ready(function(){
 	*/
 
 	var globalsVar;
+	var socket = io.connect('http://localhost:3000');
 
 	/*
 	** Jquery plugins
@@ -431,7 +432,6 @@ $(document).ready(function(){
 		$globalsTags.empty();
 		for (var i = 0; i < globalsVar.userTags.length; i++) {
 			if (~globalsVar.userTags[i].toLowerCase().indexOf($this.val().toLowerCase())) {
-				console.log('test');
 				var $tr = $(`<tr><td><a href="#">` + globalsVar.userTags[i] + `</a></td></tr>`);
 				var $tdButton = $(`<td></td>`);
 				var $button = $(`<button class="circular ui icon button del-tag"><i class="trash outline icon"></i></button>`);
@@ -491,6 +491,37 @@ $(document).ready(function(){
 	}
 
 	/*
+	** Profile.js
+	*/
+
+	var googleMap = function() {
+		var centerpos = new google.maps.LatLng(48.8582,2.3387);
+
+		var optionsGmaps = {
+			center:centerpos,
+			mapTypeId: google.maps.MapTypeId.ROADMAP,
+			zoom: 13
+		};
+		var map = new google.maps.Map(document.getElementById("map"), optionsGmaps);
+
+		var latlng;
+		latlng = new google.maps.LatLng(48.8582, 2.3387);
+		marker = new google.maps.Marker({
+			position: latlng,
+			map: map,
+			title:"Vous êtes ici",
+		});
+	}
+
+	/*
+	** Socket.io
+	*/
+
+	socket.on('newuser', function(test){
+		console.log('coucou', test)
+	});
+
+	/*
 	**
 	*/
 
@@ -508,7 +539,8 @@ $(document).ready(function(){
 		editProfile();
 		Dropzone.discover();
 		newTag();
-		delTags($('.del-tag'))
+		delTags($('.del-tag'));
+		googleMap();
 	}
 
 	runAllJs();

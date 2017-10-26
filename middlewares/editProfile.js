@@ -87,7 +87,6 @@ module.exports = {
 		});
 	},
 	editUser: (req, res) => {
-		console.log(req.body);
 		if (1 == module.exports.validData(req.body)) {
 			module.exports.saveModif(req, res);
 		}

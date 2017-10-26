@@ -21,10 +21,14 @@ app.use(favicon(path.join(__dirname, 'public', 'images/favicon.png')))
 	.use((req, res, next) => {
 		if (!req.localisation)
 			request('http://ip-api.io/api/json')
-				.then(response => {
-					req.localisation = JSON.parse(response);
-					return next();
-				});
+			.then(response => {
+				req.localisation = JSON.parse(response);
+				return next();
+			})
+			.catch(err => {
+				console.log('plus de requete dispo');
+				return next();
+			});
 	})
 	.use((req, res, next) => {
 		if (!req.mail)

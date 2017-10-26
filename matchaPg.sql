@@ -23,23 +23,27 @@ CREATE TABLE users (
 CREATE TABLE "images" (
 	"user_id" INT NOT NULL,
 	"path" VARCHAR NOT NULL,
-	"main" BOOLEAN DEFAULT FALSE,
-	CONSTRAINT img_id FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE
-	) WITH (
-	OIDS=FALSE
+	"main" BOOLEAN DEFAULT FALSE
 );
 
 CREATE TABLE "user_tags" (
 	"user_id" INT NOT NULL,
-	"tags" VARCHAR NOT NULL,
-	CONSTRAINT tag_id FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE
-	) WITH (
-	OIDS=FALSE
+	"tags" VARCHAR NOT NULL
 );
-
-
 
 CREATE TABLE "tags" (
 	"id" SERIAL PRIMARY KEY,
 	"name" VARCHAR NOT NULL UNIQUE
+);
+
+CREATE TABLE "likes" (
+	"from" INT NOT NULL,
+	"to" VARCHAR NOT NULL,
+	"like" INT DEFAULT 0
+);
+
+CREATE TABLE "users_block" (
+	"from" INT NOT NULL,
+	"to" VARCHAR NOT NULL,
+	"block" BOOLEAN DEFAULT FALSE
 );
