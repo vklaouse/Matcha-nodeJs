@@ -26,7 +26,7 @@ app.use(favicon(path.join(__dirname, 'public', 'images/favicon.png')))
 				return next();
 			})
 			.catch(err => {
-				console.log('plus de requete dispo');
+				req.localisation = {latitude: 0, longitude: 0, ip: 0};
 				return next();
 			});
 	})

@@ -1,5 +1,46 @@
 extends layout
 
 block content
-	//- div(style="height:1000px; width:1000px;")
-	div(id="map" style="height:1000px; width:1000px;")
+	- if (!exist)
+		div(class='body-fixed-menu vertical-center-parent')
+			div(class="vertical-center-enfant" style="text-align: center;")
+				h1 Ce profil n'est pas disponible ou n'existe pas
+				i(class="thumbs outline down icon massive")
+	- else
+		div(class='body-fixed-menu')
+			div(class="ui two column segment doubling stackable grid container")
+				div(class="column center-div")
+					img(class="ui medium left rounded image" style="margin:auto" src="#{main.path}")
+				div(class="column center-div" style="margin:auto")
+					table
+						tbody
+							tr
+								td 
+									h4 Login: 
+								td 
+									p #{from.login}
+							tr
+								td 
+									h4 Nom: 
+								td 
+									p #{from.name}
+							tr
+								td 
+									h4 Prénom: 
+								td 
+									p #{from.first_name}
+							tr
+								td 
+									h4 Sexe: 
+								td 
+									p #{from.sex}
+							tr
+								td 
+									h4 Préferences sexuel:
+								td 
+									p #{from.sex_pref}
+					div(class="form ui field" style="width:100%;")
+						textarea(readonly) #{from.bio}
+			div(class="field")
+				div(class="ui one column segment doubling stackable grid container" style="text-align:center;")
+					div(id="map-profile" style="height:500px; width:100%;" lat="#{from.lat}" long="#{from.longi}")

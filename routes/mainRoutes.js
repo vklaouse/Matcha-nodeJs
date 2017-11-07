@@ -7,6 +7,7 @@ let editProfile = require('./editProfile.js');
 let photo = require('./photo.js');
 let home = require('./home.js');
 let tag = require('./tag.js');
+let accountState = require('./accountState.js');
 let error = require('./error.js');
 let tools = require('../middlewares/tools.js');
 let multer = require('multer');
@@ -33,6 +34,10 @@ module.exports = {
 
 		editProfile.get(router, tools.isLog);
 		editProfile.post(router, tools.isLog);
+		editProfile.patch(router, tools.isLog);
+
+		accountState.patch(router, tools.isLog);
+		accountState.delete(router, tools.isLog);
 
 		photo.post(router, tools.isLog, upload.single('file'));
 		photo.delete(router, tools.isLog);

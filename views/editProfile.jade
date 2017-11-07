@@ -6,7 +6,7 @@ block content
 			div(class="column center-div" id='dropzone')
 				form(action='/photo' class="ui form dropzone" enctype="multipart/form-data" id="myAwesomeDropzone")
 					div(class="dz-default dz-message" style="padding:15%;")
-						span Photo
+						span Insérer vos photo
 					div(class="ui error message err-message")
 						ul(class="list invalid-input-msg")
 							li Vous avez déja 5 photos.
@@ -124,7 +124,7 @@ block content
 								- for (var i = 0; i < user_tags.length; i++)
 									- if (user_tags[i])
 										tr
-											td 
+											td
 												a(href="#") ##{user_tags[i]}
 											td 
 												button(class="circular ui icon button del-tag")
@@ -141,3 +141,23 @@ block content
 											tr
 												td 
 													a(href="#") ##{tags[i]}
+		div(class="field")
+			div(class="ui one column segment doubling stackable grid container" style="text-align:center;")
+				div(id="map-edit-profile" style="height:500px; width:100%;" lat="#{from.lat}" long="#{from.longi}")
+		//- div(class="field")
+		div(class="ui two column segment doubling stackable grid container" style="text-align:center;")
+			div(class="column center-div" id="accountState")
+				- if (from.active)
+					button(class="ui inverted green button" id="disable-account" style='width: 100%') Désactiver mon compte
+				- else
+					button(class="ui inverted green button" id="enable-account" style='width: 100%') Réactiver mon compte
+			div(class="column center-div")
+				button(class="ui inverted red button" id="delete-account" style='width: 100%') Supprimer mon compte
+				div(class="ui mini modal")
+					div(class="header") Suppression de compte
+					div(class="content") 
+						p Etes vous sur de vouloir supprimer votre compte ?
+					div(class="actions")
+						div(class="ui negative button") No
+						div(class="ui positive right labeled icon button") Yes
+							i(class="checkmark icon")

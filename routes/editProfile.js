@@ -7,9 +7,13 @@ module.exports = {
 		});
 	},
 	post: function(router, isLog){
-
 		router.post('/editProfile', isLog, function(req, res, next) {
 			middleware.editUser(req, res);
+		});
+	},
+	patch: function(router, isLog){
+		router.patch('/editProfile', isLog, function(req, res, next) {
+			middleware.modifLocalisation(req, res);
 		});
 	}
 }

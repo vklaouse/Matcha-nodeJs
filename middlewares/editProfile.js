@@ -10,10 +10,10 @@ module.exports = {
 		var img = [];
 		var tags = [];
 		var user_tags = [];
-		var query = 'SELECT first_name, name, sex, sex_pref, mail, bio, NULL as path, FALSE as main, NULL as user_tags, NULL as tags FROM users WHERE id=$(uId)'
-					+ ' UNION SELECT NULL, NULL, NULL, NULL, NULL, NULL, path, main, NULL, NULL FROM images WHERE user_id=$(uId)'
-					+ ' UNION SELECT NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, tags, NULL FROM user_tags WHERE user_id=$(uId)'
-					+ ' UNION SELECT NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, name FROM tags';
+		var query = 'SELECT first_name, name, sex, sex_pref, mail, bio, latitude, longitude, active, NULL as path, FALSE as main, NULL as user_tags, NULL as tags FROM users WHERE id=$(uId)'
+					+ ' UNION SELECT NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, path, main, NULL, NULL FROM images WHERE user_id=$(uId)'
+					+ ' UNION SELECT NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, tags, NULL FROM user_tags WHERE user_id=$(uId)'
+					+ ' UNION SELECT NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, name FROM tags';
 		req.db.many(query, req.session)
 		.then(data => {
 			for (var i = 0; i < data.length; i++){
@@ -32,7 +32,8 @@ module.exports = {
 					from = {
 						first_name: data[i].first_name, name: data[i].name,
 						sex: data[i].sex, sex_pref: data[i].sex_pref,
-						mail: data[i].mail, bio: data[i].bio
+						mail: data[i].mail, bio: data[i].bio, active: data[i].active,
+						lat: data[i].latitude, longi: data[i].longitude
 					};
 				}
 				
@@ -71,7 +72,6 @@ module.exports = {
 		req.body.id = req.session.uId;
 		req.db.none(query, req.body)
 		.then(data => {
-			console.log(data)
 			res.send({
 				status: 'success',
 				data: data
@@ -96,5 +96,21 @@ module.exports = {
 				data: data
 			});
 		}
+	},
+	modifLocalisation: (req, res) => {
+		var query = `UPDATE users SET latitude=$(lat), longitude=$(long) WHERE id=$(id)`;
+		req.body.id = req.session.uId;
+		req.db.none(query, req.body)
+		.then(data => {
+			res.send({
+				status: 'success',
+				data: data
+			});
+		}).catch(err => {
+			res.send({
+				status: 'fail',
+				data: err
+			});
+		});
 	}
 }

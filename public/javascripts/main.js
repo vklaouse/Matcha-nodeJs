@@ -489,28 +489,133 @@ $(document).ready(function(){
 			}
 		});
 	}
+	
+	var saveNewLocation = function (lat, long) {
+		var data = { lat: lat, long: long };
+		$.ajax({
+			type : 'PATCH',
+			url : '/editProfile',
+			data : data,
+			dataType : 'json',
+			encode : true
+		}).done(function (response){
+		}).always(function (){});
+	}
+	
+	var googleMapEditProfile = function() {
+		var mapId = document.getElementById("map-edit-profile");
+		var $mapId = $(mapId);
+		if (mapId) {
+			var lat = $mapId.attr("lat");
+			var long = $mapId.attr("long");
+			var latlng = new google.maps.LatLng(lat, long);
 
+			var optionsGmaps = {
+				center:latlng,
+				mapTypeId: google.maps.MapTypeId.ROADMAP,
+				zoom: 15,
+				streetViewControl: false,
+				mapTypeControl: false,
+			};
+			var map = new google.maps.Map(mapId, optionsGmaps);
+			var marker = new google.maps.Marker({
+				position: latlng,
+				map: map,
+				title:"Vous êtes ici",
+			});
+			google.maps.event.addListener(map, 'click', function(event) {
+				var loc = event.latLng;
+				marker.setPosition(loc);
+				map.setCenter(loc);
+				saveNewLocation(loc.lat(), loc.lng());
+			});
+		}
+	}
+
+	var disableEnableAccount = function (active) {
+		var data = {active: active};
+		$.ajax({
+			type : 'patch',
+			url : '/accountState',
+			data : data,
+			dataType : 'json',
+			encode : true
+		}).done(function (response){
+			$accountState = $('#accountState');
+			if (response.data.active) {
+				$('#enable-account').remove();
+				$accountState.append(`<button class="ui inverted green button" id="disable-account" style='width: 100%'>Désactiver mon compte </button>`);
+				disableAccountButton();
+			}
+			else {
+				$('#disable-account').remove();
+				$accountState.append(`<button class="ui inverted green button" id="enable-account" style='width: 100%'> Réactiver mon compte </button>`);
+				enableAccountButton();
+			}
+		}).always(function (){});
+	}
+
+	var enableAccountButton = function () {
+		$('#enable-account').off('click').on('click', function () {
+			disableEnableAccount(true);
+		});
+	}
+
+	var disableAccountButton = function () {
+		$('#disable-account').off('click').on('click', function () {
+			disableEnableAccount(false);
+		});
+	}
+
+	var deleteAccount = function () {
+		$.ajax({
+			type : 'delete',
+			url : '/accountState',
+			data : {},
+			dataType : 'json',
+			encode : true
+		}).done(function (response){
+			Turbolinks.visit('/logout');
+		}).always(function (){});
+	}
+
+	var deleteAccountButton = function () {
+		$('#delete-account').off('click').on('click', function () {
+			$('.ui .modal').modal("setting", {
+				onApprove: function () {
+					deleteAccount();
+					return false;
+				}
+			}).modal('show');
+		});
+	}
+	
 	/*
 	** Profile.js
 	*/
 
-	var googleMap = function() {
-		var centerpos = new google.maps.LatLng(48.8582,2.3387);
+	var googleMapProfile = function() {
+		var mapId = document.getElementById("map-profile");
+		var $mapId = $(mapId);
+		if (mapId) {
+			var lat = $mapId.attr("lat");
+			var long = $mapId.attr("long");
+			var latlng = new google.maps.LatLng(lat, long);
 
-		var optionsGmaps = {
-			center:centerpos,
-			mapTypeId: google.maps.MapTypeId.ROADMAP,
-			zoom: 13
-		};
-		var map = new google.maps.Map(document.getElementById("map"), optionsGmaps);
-
-		var latlng;
-		latlng = new google.maps.LatLng(48.8582, 2.3387);
-		marker = new google.maps.Marker({
-			position: latlng,
-			map: map,
-			title:"Vous êtes ici",
-		});
+			var optionsGmaps = {
+				center:latlng,
+				mapTypeId: google.maps.MapTypeId.ROADMAP,
+				zoom: 15,
+				streetViewControl: false,
+				mapTypeControl: false,
+			};
+			var map = new google.maps.Map(mapId, optionsGmaps);
+			var marker = new google.maps.Marker({
+				position: latlng,
+				map: map,
+				title:"Vous êtes ici",
+			});
+		}
 	}
 
 	/*
@@ -540,7 +645,11 @@ $(document).ready(function(){
 		Dropzone.discover();
 		newTag();
 		delTags($('.del-tag'));
-		googleMap();
+		googleMapEditProfile();
+		disableAccountButton();
+		enableAccountButton();
+		deleteAccountButton();
+		googleMapProfile();
 	}
 
 	runAllJs();
