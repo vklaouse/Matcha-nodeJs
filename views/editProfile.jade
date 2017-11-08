@@ -1,7 +1,7 @@
 extends layout
 
 block content
-	div(class='body-fixed-menu')
+	div(class='body-fixed-menu text-color')
 		div(class="ui two column segment doubling stackable grid container" style="text-align:center;")
 			div(class="column center-div" id='dropzone')
 				form(action='/photo' class="ui form dropzone" enctype="multipart/form-data" id="myAwesomeDropzone")
@@ -108,43 +108,42 @@ block content
 					div(class="ui error message err-message")
 					div(class="ui success message success-message" )
 						| Vos informations ont été sauvegardé.
-		div(class="field")
-			div(class="ui two column segment doubling stackable grid container" style="text-align:center;")
+		div(class="ui container segment")
+			div(class="field")
 				input(type='text' name="tag" class='input-out-form' id='add-tag' placeholder="Nouveau tag")
-		div(class="field")
-			div(class="ui two column segment doubling stackable grid container" style="min-height:345px; text-align:center;")
-				div(class="column center-div")
-					div(class="field" style='overflow-y:auto; max-height:300px; margin-top: 2%;')
-						table(class="ui purple table" id='my-tags' style='text-align:center')
-							thead
-								tr
-									th Mes tags
-									th Supprimer
-							tbody
-								- for (var i = 0; i < user_tags.length; i++)
-									- if (user_tags[i])
-										tr
-											td
-												a(href="#") ##{user_tags[i]}
-											td 
-												button(class="circular ui icon button del-tag")
-													i(class="trash outline icon")
-				div(class="column center-div")
-					div(class="field" style='overflow-y:auto; max-height:300px; margin-top: 2%;')
-						table(class="ui purple table" id='global-tags' style='text-align:center')
-							thead
-								tr
-									th Tags
-							tbody
-								- for (var i = 0; i < tags.length; i++)
-										- if (tags[i])
+			div(class="field")
+				div(class="ui two column doubling stackable grid container" style="min-height:345px; text-align:center;")
+					div(class="column center-div")
+						div(class="field" style='overflow-y:auto; max-height:300px; margin-top: 2%;')
+							table(class="ui purple table" id='my-tags' style='text-align:center')
+								thead
+									tr
+										th Mes tags
+										th Supprimer
+								tbody
+									- for (var i = 0; i < user_tags.length; i++)
+										- if (user_tags[i])
 											tr
+												td
+													a(href="#") ##{user_tags[i]}
 												td 
-													a(href="#") ##{tags[i]}
+													button(class="circular ui icon button del-tag")
+														i(class="trash outline icon")
+					div(class="column center-div")
+						div(class="field" style='overflow-y:auto; max-height:300px; margin-top: 2%;')
+							table(class="ui purple table" id='global-tags' style='text-align:center')
+								thead
+									tr
+										th Tags
+								tbody
+									- for (var i = 0; i < tags.length; i++)
+											- if (tags[i])
+												tr
+													td 
+														a(href="#") ##{tags[i]}
 		div(class="field")
 			div(class="ui one column segment doubling stackable grid container" style="text-align:center;")
 				div(id="map-edit-profile" style="height:500px; width:100%;" lat="#{from.lat}" long="#{from.longi}")
-		//- div(class="field")
 		div(class="ui two column segment doubling stackable grid container" style="text-align:center;")
 			div(class="column center-div" id="accountState")
 				- if (from.active)
@@ -158,6 +157,6 @@ block content
 					div(class="content") 
 						p Etes vous sur de vouloir supprimer votre compte ?
 					div(class="actions")
-						div(class="ui negative button") No
-						div(class="ui positive right labeled icon button") Yes
+						div(class="ui negative button") non
+						div(class="ui positive right labeled icon button") Oui
 							i(class="checkmark icon")

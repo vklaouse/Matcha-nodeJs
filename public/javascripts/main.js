@@ -618,6 +618,110 @@ $(document).ready(function(){
 		}
 	}
 
+	var zoomImg = function () {
+		$('.img-profile').off('click').on('click', function () {
+			$('.img-modal').attr('src', $(this).attr('src'));
+			$('.ui .modal').modal('show');
+		});
+	}
+
+	var like = function() {
+		globalsVar.profileId =  $('.body-fixed-menu').attr('userId');
+		$("#like").off('click').on('click', function() {
+			$.ajax({
+				type : 'post',
+				url : '/like',
+				data : {id: globalsVar.profileId},
+				dataType : 'json',
+				encode : true
+			}).done(function (response){
+				if (response.status == 'success') {
+					$('#like > a').text(Number($('#like > a').text()) + 1);
+					$('#like > div').removeClass('basic');
+					$('#like').addClass('heartbeat');
+					dislike();
+				}
+			}).always(function (){});
+		});
+	}
+
+	var dislike = function() {
+		if ($('#like').hasClass('heartbeat'))
+			$("#like").off('click').on('click', function() {
+				$.ajax({
+					type : 'delete',
+					url : '/like',
+					data : {id: globalsVar.profileId},
+					dataType : 'json',
+					encode : true
+				}).done(function (response){
+					if (response.status == 'success') {
+						$('#like > a').text(Number($('#like > a').text()) - 1);
+						$('#like > div').addClass('basic');
+						$('#like').removeClass('heartbeat');
+						like();
+					}
+				}).always(function (){});
+			});
+	}
+
+	var block = function() {
+		$("#block").off('click').on('click', function() {
+			$('#block-modal').modal("setting", {
+				onApprove: function () {
+					blockAjax();
+					return false;
+				}
+			}).modal('show');
+		});
+	}
+
+	var blockAjax =  function() {
+		$.ajax({
+			type : 'post',
+			url : '/block',
+			data : {},
+			dataType : 'json',
+			encode : true
+		}).done(function (response){
+		}).always(function (){});
+	}
+
+	var report = function() {
+		$("#signal").off('click').on('click', function() {
+			$('#signal-modal').modal("setting", {
+				onApprove: function () {
+					ajaxReport();
+					return false;
+				}
+			}).modal('show');
+		});
+	}
+
+	var ajaxReport = function() {
+		$.ajax({
+			type : 'post',
+			url : '/report',
+			data : {},
+			dataType : 'json',
+			encode : true
+		}).done(function (response){
+		}).always(function (){});
+	}
+
+	var unblock = function() {
+		$("#unblock").off('click').on('click', function() {
+			$.ajax({
+				type : 'delete',
+				url : '/block',
+				data : {},
+				dataType : 'json',
+				encode : true
+			}).done(function (response){
+			}).always(function (){});
+		});
+	}
+
 	/*
 	** Socket.io
 	*/
@@ -631,10 +735,7 @@ $(document).ready(function(){
 	*/
 
 	var runAllJs = function() {
-		globalsVar = {
-			tags: [],
-			userTags: []
-		};
+		globalsVar = { tags: [], userTags: [], profileId: 0 };
 		$('.ui.dropdown').dropdown();
 		subscribe();
 		login();
@@ -650,6 +751,12 @@ $(document).ready(function(){
 		enableAccountButton();
 		deleteAccountButton();
 		googleMapProfile();
+		zoomImg();
+		like();
+		dislike();
+		block();
+		unblock();
+		report();
 	}
 
 	runAllJs();

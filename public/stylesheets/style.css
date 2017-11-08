@@ -26,6 +26,10 @@ body {
 	color: #434c5b !important;
 }
 
+.text-color label {
+	color: #434c5b !important;
+}
+
 body > .grid {
 	min-height: auto;
 }
@@ -122,6 +126,11 @@ body > .little {
 	transform: translateY(-50%);
 }
 
-td > p {
-	margin-left: 15px;
+.pres > tr > td {
+	width: 50%;
+}
+
+.tags-profile {
+	max-height: 110px;
+	overflow-x: auto;
 }

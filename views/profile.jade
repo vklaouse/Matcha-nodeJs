@@ -4,43 +4,146 @@ block content
 	- if (!exist)
 		div(class='body-fixed-menu vertical-center-parent')
 			div(class="vertical-center-enfant" style="text-align: center;")
-				h1 Ce profil n'est pas disponible ou n'existe pas
-				i(class="thumbs outline down icon massive")
+				h1(class="text-color") Ce profil n'est pas disponible ou n'existe pas
+				i(class="thumbs outline down icon massive text-color")
 	- else
-		div(class='body-fixed-menu')
-			div(class="ui two column segment doubling stackable grid container")
-				div(class="column center-div")
-					img(class="ui medium left rounded image" style="margin:auto" src="#{main.path}")
-				div(class="column center-div" style="margin:auto")
-					table
-						tbody
-							tr
-								td 
-									h4 Login: 
-								td 
-									p #{from.login}
-							tr
-								td 
-									h4 Nom: 
-								td 
-									p #{from.name}
-							tr
-								td 
-									h4 Prénom: 
-								td 
-									p #{from.first_name}
-							tr
-								td 
-									h4 Sexe: 
-								td 
-									p #{from.sex}
-							tr
-								td 
-									h4 Préferences sexuel:
-								td 
-									p #{from.sex_pref}
-					div(class="form ui field" style="width:100%;")
-						textarea(readonly) #{from.bio}
+		div(class='body-fixed-menu text-color' userId="#{from.id}")
+			div(class="ui segment container" style="margin-top: 14px;")
+				div(class="ui two column doubling stackable grid container")
+					div(class="column center-div" style="margin:auto")
+						
+						- if (main.path)
+							img(class="ui medium left rounded image" style="margin:auto" src="#{main.path}")
+						- else
+							img(class="ui medium left rounded image" style="margin:auto" src="/images/profile.png")
+						- if (!mySelf)
+							div(style="margin-top: 5px;" class="like-buttons")
+								- if (iLikeIt)
+									div(class="ui labeled heartbeat button" id="like" tabindex="0")
+										a(class="ui basic red right pointing label" style="border-radius: .28571429rem; border-top-right-radius: 0; border-bottom-right-radius: 0") 
+											| #{likes}
+										div(class="ui red button" style="border-radius: .28571429rem; border-top-left-radius: 0; border-bottom-left-radius: 0")
+											i(class="heartbeat icon")
+								- else
+									div(class="ui labeled button" id="like" tabindex="0")
+										a(class="ui basic red right pointing label" style="border-radius: .28571429rem; border-top-right-radius: 0; border-bottom-right-radius: 0") 
+											| #{likes}
+										div(class="ui red basic button" style="border-radius: .28571429rem; border-top-left-radius: 0; border-bottom-left-radius: 0")
+											i(class="heartbeat icon")
+								div(style="display:inline-block; float: right; margin-top:5px;")
+									- if (!mySelf)
+										p(style="text-align:right;")
+											i(class="circle green icon") 
+											| Connecté
+									- else
+										p(style="text-align:right;")
+											i(class="circle thin icon icon") 
+											| Derniere connexion
+							div(style="margin-top: 5px;")
+								button(class="ui right labeled mini icon button" id="signal")
+									i(class="right send outline icon") 
+									| Signaler
+								- if (block)
+									button(class="ui left labeled mini icon button" id="unblock" style="float: right;")
+										i(class="left remove user icon") 
+										| Débloquer
+								- else
+									button(class="ui left labeled mini icon button" id="block" style="float: right;")
+										i(class="left remove user icon") 
+										| Bloquer
+					div(class="column center-div" style="margin:auto")
+						table(style="width: 100%;")
+							tbody(class="pres")
+								tr
+									td
+										h4 Login: 
+									td 
+										p #{from.login}
+								tr
+									td 
+										h4 Nom: 
+									td 
+										p #{from.name}
+								tr
+									td 
+										h4 Prénom: 
+									td 
+										p #{from.first_name}
+								tr
+									td 
+										h4 Age: 
+									td 
+										p #{from.age} ans
+								tr
+									td 
+										h4 Sexe: 
+									td
+										- if (from.sex == 'F')
+											p Femme
+										- else if (from.sex == 'H')
+											p Homme
+										- else
+											p 
+								tr
+									td 
+										h4 Recherche:
+									td
+										- if (from.sex_pref == 'F')
+											p Femme
+										- else if (from.sex_pref == 'H')
+											p Homme
+										- else
+											p Homme et Femme
+								tr
+									td
+										h4 Biographie: 
+						div(class="form ui field" style="width:100%;")
+							textarea(readonly style="border: hidden") #{from.bio}
+				div(class="ui divider" style="margin-top: 20px; margin-bottom: 20px;")
+				div(class="ui two column doubling stackable grid container")
+					div(class="column center-div" style="max-height: 360px;")
+						h4 Tags:
+						div(class="tags-profile")
+							- for (var i = 0; i < user_tags.length; i++)
+								- if (user_tags[i].matching_tag)
+									a(class='ui purple label' style="margin: 4px;") ##{user_tags[i].tag}
+								- else
+									a(class='ui label' style="margin: 4px;") ##{user_tags[i].tag}
+						- if (!mySelf)
+							h4 Mes tags:
+							div(class="tags-profile")
+								- for (var i = 0; i < my_tags.length; i++)
+									- if (my_tags[i].matching_tag)
+										a(class='ui purple label' style="margin: 4px;") ##{my_tags[i].tag}
+									- else
+										a(class='ui label' style="margin: 4px;") ##{my_tags[i].tag}
+					div(class="column center-div")
+						h4 Photo:
+						- for (var i = 0; i < img.length; i++)
+							- if (img[i].path)
+								div(class="ui img-list image")
+									img(class='img-profile' src='#{img[i].path}')
+						div(class="ui mini modal" style="height:auto; width:auto; margin-left: -150px;")
+							img(class='img-modal ui medium image' src='')
 			div(class="field")
 				div(class="ui one column segment doubling stackable grid container" style="text-align:center;")
 					div(id="map-profile" style="height:500px; width:100%;" lat="#{from.lat}" long="#{from.longi}")
+	div(class="ui modal" id="signal-modal")
+		div(class="header") Signaler un utilisateur
+		div(class="content")
+			div(class="ui form")
+				div(class="field")
+					label Veuillez entrer les motifs de votre signalement
+					textarea
+		div(class="actions")
+			div(class="ui negative button") Annuler
+			div(class="ui positive right labeled icon button") Envoyer
+				i(class="checkmark icon")
+	div(class="ui mini modal" id="block-modal")
+		div(class="header") Bloquer un utilisateur
+		div(class="content") 
+			p Etes vous sur de vouloir bloquer cet utilisateur ?
+		div(class="actions")
+			div(class="ui negative button") Non
+			div(class="ui positive right labeled icon button") Oui
+				i(class="checkmark icon")

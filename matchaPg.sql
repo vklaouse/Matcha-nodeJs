@@ -39,11 +39,10 @@ CREATE TABLE "tags" (
 
 CREATE TABLE "likes" (
 	"user_id" INT NOT NULL,
-	"to" INT NOT NULL,
-	"like" INT DEFAULT 0
+	"like_for" INT NOT NULL
 );
 
 CREATE TABLE "users_block" (
 	"user_id" INT NOT NULL,
-	"to" INT NOT NULL
+	"block_for" INT NOT NULL
 );

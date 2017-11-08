@@ -7,6 +7,9 @@ let editProfile = require('./editProfile.js');
 let photo = require('./photo.js');
 let home = require('./home.js');
 let tag = require('./tag.js');
+let block = require('./block.js');
+let like = require('./like.js');
+let report = require('./report.js');
 let accountState = require('./accountState.js');
 let error = require('./error.js');
 let tools = require('../middlewares/tools.js');
@@ -18,7 +21,7 @@ module.exports = {
 		let storage =   multer.memoryStorage();
 		let upload = multer({ storage: storage })
 
-		// Not login
+		// Not loged
 		login.get(router, tools.isNotLog);
 		login.post(router, tools.isNotLog);
 
@@ -28,9 +31,17 @@ module.exports = {
 		mdpForget.get(router, tools.isNotLog);
 		mdpForget.post(router, tools.isNotLog);
 
-		// Login
+		// Loged
 		profile.get(router, tools.isLog);
 		profile.getWithId(router, tools.isLog);
+
+		like.post(router, tools.isLog);
+		like.delete(router, tools.isLog);
+
+		block.post(router, tools.isLog);
+		block.delete(router, tools.isLog);
+
+		report.post(router, tools.isLog);
 
 		editProfile.get(router, tools.isLog);
 		editProfile.post(router, tools.isLog);
