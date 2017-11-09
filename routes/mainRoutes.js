@@ -11,6 +11,7 @@ let block = require('./block.js');
 let like = require('./like.js');
 let report = require('./report.js');
 let accountState = require('./accountState.js');
+let whoWatchMe = require('./whoWatchMe.js');
 let error = require('./error.js');
 let tools = require('../middlewares/tools.js');
 let multer = require('multer');
@@ -42,6 +43,9 @@ module.exports = {
 		block.delete(router, tools.isLog);
 
 		report.post(router, tools.isLog);
+
+		whoWatchMe.getViews(router, tools.isLog);
+		whoWatchMe.getLikes(router, tools.isLog);
 
 		editProfile.get(router, tools.isLog);
 		editProfile.post(router, tools.isLog);

@@ -39,7 +39,7 @@ block content
 										p(style="text-align:right;")
 											i(class="circle thin icon icon") 
 											| Derniere connexion
-							div(style="margin-top: 5px;")
+							div(style="margin-top: 5px;" id="other-buttons")
 								button(class="ui right labeled mini icon button" id="signal")
 									i(class="right send outline icon") 
 									| Signaler
@@ -51,6 +51,18 @@ block content
 									button(class="ui left labeled mini icon button" id="block" style="float: right;")
 										i(class="left remove user icon") 
 										| Bloquer
+						- else
+							div(style="margin-top: 5px;" class="like-buttons")
+								div(class="ui labeled button" id="who-like-me" tabindex="0")
+									a(class="ui basic red right pointing label" style="border-radius: .28571429rem; border-top-right-radius: 0; border-bottom-right-radius: 0") 
+										| #{likes}
+									div(class="ui red button" style="border-radius: .28571429rem; border-top-left-radius: 0; border-bottom-left-radius: 0")
+										i(class="heartbeat icon")
+								div(class="ui labeled button" id="who-watch-me" tabindex="0" style="float: right;")
+									div(class="ui blue button")
+										i(class="unhide icon")
+									a(class="ui left pointing basic blue label")
+										| #{watch}
 					div(class="column center-div" style="margin:auto")
 						table(style="width: 100%;")
 							tbody(class="pres")
@@ -123,27 +135,36 @@ block content
 							- if (img[i].path)
 								div(class="ui img-list image")
 									img(class='img-profile' src='#{img[i].path}')
-						div(class="ui mini modal" style="height:auto; width:auto; margin-left: -150px;")
+						div(class="ui mini modal" id="img-modal" style="height:auto; width:auto; margin-left: -150px;")
 							img(class='img-modal ui medium image' src='')
 			div(class="field")
 				div(class="ui one column segment doubling stackable grid container" style="text-align:center;")
 					div(id="map-profile" style="height:500px; width:100%;" lat="#{from.lat}" long="#{from.longi}")
-	div(class="ui modal" id="signal-modal")
-		div(class="header") Signaler un utilisateur
-		div(class="content")
-			div(class="ui form")
-				div(class="field")
-					label Veuillez entrer les motifs de votre signalement
-					textarea
-		div(class="actions")
-			div(class="ui negative button") Annuler
-			div(class="ui positive right labeled icon button") Envoyer
-				i(class="checkmark icon")
-	div(class="ui mini modal" id="block-modal")
-		div(class="header") Bloquer un utilisateur
-		div(class="content") 
-			p Etes vous sur de vouloir bloquer cet utilisateur ?
-		div(class="actions")
-			div(class="ui negative button") Non
-			div(class="ui positive right labeled icon button") Oui
-				i(class="checkmark icon")
+	- if (!mySelf)
+		div(class="ui modal" id="signal-modal")
+			div(class="header") Signaler un utilisateur
+			div(class="content")
+				div(class="ui form")
+					div(class="field")
+						label Veuillez entrer les motifs de votre signalement:
+						textarea(id="report-content")
+			div(class="actions")
+				div(class="ui negative button") Annuler
+				div(class="ui positive right labeled icon button") Envoyer
+					i(class="checkmark icon")
+		div(class="ui mini modal" id="block-modal")
+			div(class="header") Bloquer un utilisateur
+			div(class="content") 
+				p Etes vous sur de vouloir bloquer cet utilisateur ?
+			div(class="actions")
+				div(class="ui negative button") Non
+				div(class="ui positive right labeled icon button") Oui
+					i(class="checkmark icon")
+	- else
+		div(class="ui longer tiny modal" id="watch-likes")
+			div(class="header") Utilisateurs qui ont likes mon profil
+			div(class="scrolling content" style="text-align:center;") 
+				
+		div(class="ui longer tiny modal" id="watch-stalkers")
+			div(class="header") Utilisateurs qui ont regardé mon profil
+			div(class="content scrolling" style="text-align:center;") 

@@ -42,6 +42,12 @@ CREATE TABLE "likes" (
 	"like_for" INT NOT NULL
 );
 
+CREATE TABLE "watch" (
+	"user_id" INT NOT NULL,
+	"watching" INT NOT NULL,
+	"date" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE TABLE "users_block" (
 	"user_id" INT NOT NULL,
 	"block_for" INT NOT NULL

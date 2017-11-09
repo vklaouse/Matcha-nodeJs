@@ -13,21 +13,23 @@ module.exports = {
 		var user_tags = [];
 		var my_tags = [];
 		var likes = 0;
+		var watch = 0;
 		var iLikeIt = false;
-		var myLikes = [];
 		var block = false;
 		var mySelf;
 		if (req.session.uId == req.params.id) {
 			mySelf = true;
-			query = `SELECT birth, login, first_name, name, sex, sex_pref, bio, latitude, longitude, NULL as path, FALSE as main, NULL as user_tags, NULL as like_to FROM users WHERE id=$(id)
-						UNION SELECT NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, path, main, NULL, NULL FROM images WHERE user_id=$(id)
-						UNION SELECT NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, tags, NULL FROM user_tags WHERE user_id=$(id)`
+			query = `SELECT birth, login, first_name, name, sex, sex_pref, bio, latitude, longitude, NULL as path, FALSE as main, NULL as user_tags, NULL as like_from, NULL as watch_nbr FROM users WHERE id=$(id)
+						UNION SELECT NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, path, main, NULL, NULL, NULL FROM images WHERE user_id=$(id)
+						UNION SELECT NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, tags, NULL, NULL FROM user_tags WHERE user_id=$(id)
+						UNION SELECT NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, user_id::text, NULL FROM likes WHERE like_for=$(id)
+						UNION SELECT NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, user_id::text FROM watch WHERE watching=$(id)`
 		}
 		else {
 			mySelf = false;
 			req.params.uId = req.session.uId;
 			req.params.textId = req.params.id;
-			query = `SELECT birth, login, first_name, name, sex, sex_pref, bio, latitude, longitude, NULL as path, FALSE as main, NULL as user_tags, NULL as my_tags, NULL as like_from, NULL as block, NULL as blocked FROM users WHERE id=$(id) AND active=true
+			query = `SELECT birth, login, first_name, name, sex, sex_pref, bio, latitude, longitude, NULL as path, FALSE as main, NULL as user_tags, NULL as my_tags, NULL as like_to, NULL as block, NULL as blocked FROM users WHERE id=$(id) AND active=true
 						UNION SELECT NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, path, main, NULL, NULL, NULL, NULL, NULL FROM images WHERE user_id=$(id)
 						UNION SELECT NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, tags, NULL, NULL, NULL, NULL FROM user_tags WHERE user_id=$(id)
 						UNION SELECT NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, tags, NULL, NULL, NULL FROM user_tags WHERE user_id=$(uId)
@@ -48,21 +50,19 @@ module.exports = {
 					if (data[i].main)
 						main.path = data[i].path;
 				}
-				else if (data[i].like_from) {
-					likes++;
-					console.log(data[i].like_from, iLikeIt)
-					if (data[i].like_from == req.session.uId)
-						iLikeIt = true;
-				}
 				else if (data[i].like_to) {
 					likes++;
-					myLikes.push(data[i].like_to);
-					console.log(data[i].like_from, iLikeIt)
+					if (data[i].like_to == req.session.uId)
+						iLikeIt = true;
 				}
+				else if (data[i].like_from)
+					likes++;
+				else if (data[i].watch_nbr)
+					watch++;
 				else if (data[i].block)
 					block = true;
 				else if (data[i].blocked) {
-					from.login == null;
+					from.login = null;
 					break ;
 				}
 				else
@@ -81,11 +81,19 @@ module.exports = {
 					}
 				}
 			}
-			if (from.login)
+			if (from.login) {
+				if (!mySelf) {
+					query = `INSERT INTO watch(user_id, watching)
+							SELECT $(uId), $(id) WHERE NOT EXISTS
+							(SELECT * FROM watch WHERE user_id=$(uId) AND watching=$(id));
+							UPDATE watch SET date=CURRENT_TIMESTAMP WHERE user_id=$(uId) AND watching=$(id);`;
+					req.db.none(query, req.params).then(data => {}).catch(err => {});
+				}
 				res.render('profile', {from: from, img: img, user_tags: user_tags,
 								main: main, exist: true, my_tags: my_tags,
-								mySelf: mySelf, likes: likes, my_likes: myLikes,
+								mySelf: mySelf, likes: likes, watch: watch,
 								block: block, iLikeIt: iLikeIt});
+			}
 			else
 				res.render('profile', {exist: false});
 		}).catch(err => {

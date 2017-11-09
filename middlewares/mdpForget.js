@@ -24,11 +24,11 @@ module.exports = {
 			var message = {
 				from: 'matcha@gmail.com',
 				to: req.body.mail,
-				subject: 'Message title',
-				text: 'Plaintext version of the message',
-				html: '<p>'+ password +'</p>'
+				subject: 'Matcha: mot de passe oublié',
+				html: '<h4>'+ password +'</h4>'
 			};
 			req.mail.sendMail(message, function(err, info){
+				console.log(err)
 				if (!err){
 					query = `UPDATE users SET passwd=$(password) WHERE id=$(id)`;
 					req.db.none(query, {id: data.id, password: tools.hashPasswd(password)})

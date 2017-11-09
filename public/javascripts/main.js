@@ -621,7 +621,7 @@ $(document).ready(function(){
 	var zoomImg = function () {
 		$('.img-profile').off('click').on('click', function () {
 			$('.img-modal').attr('src', $(this).attr('src'));
-			$('.ui .modal').modal('show');
+			$('#img-modal').modal('show');
 		});
 	}
 
@@ -670,7 +670,7 @@ $(document).ready(function(){
 			$('#block-modal').modal("setting", {
 				onApprove: function () {
 					blockAjax();
-					return false;
+					return true;
 				}
 			}).modal('show');
 		});
@@ -680,32 +680,14 @@ $(document).ready(function(){
 		$.ajax({
 			type : 'post',
 			url : '/block',
-			data : {},
+			data : {id: globalsVar.profileId},
 			dataType : 'json',
 			encode : true
 		}).done(function (response){
-		}).always(function (){});
-	}
-
-	var report = function() {
-		$("#signal").off('click').on('click', function() {
-			$('#signal-modal').modal("setting", {
-				onApprove: function () {
-					ajaxReport();
-					return false;
-				}
-			}).modal('show');
-		});
-	}
-
-	var ajaxReport = function() {
-		$.ajax({
-			type : 'post',
-			url : '/report',
-			data : {},
-			dataType : 'json',
-			encode : true
-		}).done(function (response){
+			$('#block').remove();
+			$('#other-buttons').append('<button class="ui left labeled mini icon button" id="unblock" style="float: right;">'
+										+ '<i class="left remove user icon"></i> Débloquer </div>');
+			unblock();
 		}).always(function (){});
 	}
 
@@ -714,11 +696,111 @@ $(document).ready(function(){
 			$.ajax({
 				type : 'delete',
 				url : '/block',
+				data : {id: globalsVar.profileId},
+				dataType : 'json',
+				encode : true
+			}).done(function (response){
+				$('#unblock').remove();
+				$('#other-buttons').append('<button class="ui left labeled mini icon button" id="block" style="float: right;">'
+											+ '<i class="left remove user icon"></i> Bloquer </div>');
+				block();
+			}).always(function (){});
+		});
+	}
+
+	var report = function() {
+		$("#signal").off('click').on('click', function() {
+			$('#signal-modal').modal("setting", {
+				onApprove: function () {
+					var reportContent = $('#report-content').val();
+					$('#report-content').val('');
+					ajaxReport(reportContent);
+					return true;
+				}
+			}).modal('show');
+		});
+	}
+
+	var ajaxReport = function(reportContent) {
+		$.ajax({
+			type : 'post',
+			url : '/report',
+			data : {report: reportContent},
+			dataType : 'json',
+			encode : true
+		}).done(function (response){
+		}).always(function (){});
+	}
+
+	var whoLikeMe = function() {
+		$('#who-like-me').off('click').on('click', function() {
+			$.ajax({
+				type : 'get',
+				url : '/whoLikeMe',
 				data : {},
 				dataType : 'json',
 				encode : true
 			}).done(function (response){
+				$modalContent = $('#watch-likes > .content');
+				if (response.status == 'success'){
+					$modalContent.empty();
+					if (response.data != 0)
+						for (var i = 0; i < response.data.length ; i++) {
+							if (response.data[i].sex == 'F')
+								response.data[i].sex = 'woman pink';
+							else if (response.data[i].sex == 'H')
+								response.data[i].sex = 'man blue';
+							else
+								response.data[i].sex = 'genderless';
+							$modalContent.append('<a href="/profile/'+ response.data[i].user_id +'" style="width:100%; margin-top: 5px;"><button class="ui basic button">'
+										+ '<div style="width:49%; float: left; text-align: left;">'
+										+ '<i class="big icon '+ response.data[i].sex +'"></i> '+ response.data[i].login +'</div>'
+										+ '<div style="width:49%; display:inline; float:right;">'
+										+ '<i class="large icon birthday"></i> '+ getAge(response.data[i].birth) +' ans</div>'
+										+ '</button></a>');
+						}
+					else
+						$modalContent.append('<h4>Personne n\'a liké votre profil</4>')
+					$('#watch-likes').modal('show');
+				}		
 			}).always(function (){});
+		});
+	}
+
+	var whoWatchMe = function() {
+		$('#who-watch-me').off('click').on('click', function() {
+			$.ajax({
+				type : 'get',
+				url : '/whoWatchMe',
+				data : {},
+				dataType : 'json',
+				encode : true
+			}).done(function (response){
+				$modalContent = $('#watch-stalkers > .content');
+				if (response.status == 'success'){
+					$modalContent.empty();
+					if (response.data != 0)
+						for (var i = 0; i < response.data.length ; i++) {
+							if (response.data[i].sex == 'F')
+								response.data[i].sex = 'woman pink';
+							else if (response.data[i].sex == 'H')
+								response.data[i].sex = 'man blue';
+							else
+								response.data[i].sex = 'genderless';
+							$modalContent.append('<a style="width:100%; margin-top: 5px;" href="/profile/'+ response.data[i].user_id +'"><button class="ui basic button">'
+										+ '<div style="width:33%; float: left; text-align: left;">'
+										+ '<i class="big icon '+ response.data[i].sex +'"></i> '+ response.data[i].login +'</div>'
+										+ '<div style="width:33%; display:inline;">'
+										+ '<i class="large icon birthday"></i> '+ getAge(response.data[i].birth) +' ans</div>'
+										+ '<div style="width:33%; float: right;"> Vous a rendu visite le '
+										+ moment(response.data[i].date).format('DD/MM/YYYY [à] HH:mm') +'</div>'
+										+ '</button></a>');
+						}
+					else
+						$modalContent.append('<h4>Personne n\'a consulter votre profil</4>')
+					$('#watch-stalkers').modal('show');
+				}
+			}).always(function (){});			
 		});
 	}
 
@@ -757,6 +839,8 @@ $(document).ready(function(){
 		block();
 		unblock();
 		report();
+		whoLikeMe();
+		whoWatchMe();
 	}
 
 	runAllJs();
