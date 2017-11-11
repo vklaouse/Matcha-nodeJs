@@ -2,7 +2,7 @@ const tools = require('./tools.js');
 const request = require('request-promise');
 
 module.exports = {
-	validData: function(data){
+	validData: (data) => {
 		if (data){
 			if ((data.password != data.password_confirm 
 				&& data.password.length <= 7)
@@ -19,7 +19,7 @@ module.exports = {
 		}
 		return data;
 	},
-	createAccount: function(req, res) {
+	createAccount: (req, res) => {
 		var valid = module.exports.validData(req.body);
 
 		if (valid == 1){
@@ -34,7 +34,7 @@ module.exports = {
 			res.send(data);
 		}
 	},
-	saveUser: function(req, res){
+	saveUser: (req, res) => {
 		var query = `INSERT INTO 
 			users (name, first_name, birth,
 				login, mail, passwd,

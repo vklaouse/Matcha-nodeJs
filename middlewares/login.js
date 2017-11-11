@@ -22,6 +22,9 @@ module.exports = {
 				req.session.sex_pref = data.sex_pref;
 				req.session.sex = data.sex;
 				req.session.login = data.login;
+				req.session.longitude = data.longitude;
+				req.session.latitude = data.latitude;
+				req.session.age = tools.getAge(data.birth);
 				req.db.none(query, data.id);
 				res.send({id: data.id});
 			}

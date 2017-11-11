@@ -197,7 +197,6 @@ $(document).ready(function(){
 					dataType : 'json',
 					encode : true
 				}).done(function(response){
-					$loading.removeClass('loading');
 					if (response.data == 'mail')
 						$('input[name="'+ response.data +'"]').invalidInput('Mail inexistant.');
 					else if (response.data == 'password')

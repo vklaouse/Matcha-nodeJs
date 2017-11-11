@@ -17,7 +17,7 @@ block content
 						- else
 							img(class="ui medium left rounded image" style="margin:auto" src="/images/profile.png")
 						- if (!mySelf)
-							div(style="margin-top: 5px;" class="like-buttons")
+							div(style="margin-top: 15px;" class="like-buttons")
 								- if (iLikeIt)
 									div(class="ui labeled heartbeat button" id="like" tabindex="0")
 										a(class="ui basic red right pointing label" style="border-radius: .28571429rem; border-top-right-radius: 0; border-bottom-right-radius: 0") 
@@ -39,7 +39,7 @@ block content
 										p(style="text-align:right;")
 											i(class="circle thin icon icon") 
 											| Derniere connexion
-							div(style="margin-top: 5px;" id="other-buttons")
+							div(style="margin-top: 15px;" id="other-buttons")
 								button(class="ui right labeled mini icon button" id="signal")
 									i(class="right send outline icon") 
 									| Signaler

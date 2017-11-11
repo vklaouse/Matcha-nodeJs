@@ -72,6 +72,8 @@ module.exports = {
 		req.body.id = req.session.uId;
 		req.db.none(query, req.body)
 		.then(data => {
+			req.session.sex_pref = req.body.sex_pref;
+			req.session.sex = req.body.sex;
 			res.send({
 				status: 'success',
 				data: data
@@ -102,6 +104,8 @@ module.exports = {
 		req.body.id = req.session.uId;
 		req.db.none(query, req.body)
 		.then(data => {
+			req.session.longitude = req.body.long;
+			req.session.latitude = req.body.lat;
 			res.send({
 				status: 'success',
 				data: data
