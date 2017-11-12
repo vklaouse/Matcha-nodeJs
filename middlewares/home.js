@@ -1,98 +1,145 @@
 const tools = require('./tools.js');
 
 module.exports = {
-	getInterestingProfiles: (req, res) => {
-		var query = '';
-		var profils = [];
+	buildFirstQuery: (req) => {
 		if (req.session.sex == 'H' && req.session.sex_pref == 'H')
-			query = `SELECT longitude, latitude, id, sex, sex_pref, birth, login FROM users 
-				WHERE sex='H' AND (sex_pref='H' OR sex_pref='B') AND active=true`;
+			return `SELECT longitude, latitude, id, sex, sex_pref, birth, login FROM users 
+				WHERE sex='H' AND (sex_pref='H' OR sex_pref='B') AND active=true AND id!=$(uId)`;
 		else if (req.session.sex == 'F' && req.session.sex_pref == 'F')
-			query = `SELECT longitude, latitude, id, sex, sex_pref, birth, login FROM users 
-				WHERE sex='F' AND (sex_pref='F' OR sex_pref='B') AND active=true`;
+			return `SELECT longitude, latitude, id, sex, sex_pref, birth, login FROM users 
+				WHERE sex='F' AND (sex_pref='F' OR sex_pref='B') AND active=true AND id!=$(uId)`;
 		else if (req.session.sex == 'F' && req.session.sex_pref == 'H')
-			query = `SELECT longitude, latitude, id, sex, sex_pref, birth, login FROM users 
-				WHERE sex='H' AND (sex_pref='F' OR sex_pref='B') AND active=true`;
+			return `SELECT longitude, latitude, id, sex, sex_pref, birth, login FROM users 
+				WHERE sex='H' AND (sex_pref='F' OR sex_pref='B') AND active=true AND id!=$(uId)`;
 		else if (req.session.sex == 'H' && req.session.sex_pref == 'F')
-			query = `SELECT longitude, latitude, id, sex, sex_pref, birth, login FROM users
-				WHERE sex='F' AND (sex_pref='H' OR sex_pref='B') AND active=true`;
+			return `SELECT longitude, latitude, id, sex, sex_pref, birth, login FROM users
+				WHERE sex='F' AND (sex_pref='H' OR sex_pref='B') AND active=true AND id!=$(uId)`;
 		else if (req.session.sex == 'H' && req.session.sex_pref == 'B')
-			query = `SELECT longitude, latitude, id, sex, sex_pref, birth, login FROM users 
-				WHERE (sex='H' OR sex='F') AND (sex_pref='H' OR sex_pref='B') AND active=true`;
+			return `SELECT longitude, latitude, id, sex, sex_pref, birth, login FROM users 
+				WHERE (sex='H' OR sex='F') AND (sex_pref='H' OR sex_pref='B') AND active=true AND id!=$(uId)`;
 		else if (req.session.sex == 'F' && req.session.sex_pref == 'B')
-			query = `SELECT longitude, latitude, id, sex, sex_pref, birth, login FROM users 
-				WHERE (sex='H' OR sex='F') AND (sex_pref='F' OR sex_pref='B') AND active=true`;
-		else {
-			res.render('home');
+			return `SELECT longitude, latitude, id, sex, sex_pref, birth, login FROM users 
+				WHERE (sex='H' OR sex='F') AND (sex_pref='F' OR sex_pref='B') AND active=true AND id!=$(uId)`;
+	},
+	buildSecondQuery: (data) => {
+		var query = '';
+		query = 'SELECT NULL AS user_id, NULL AS path, like_for, NULL as tags, NULL as user_id_tag, NULL as blocked FROM likes WHERE like_for IN ('
+		for (var i = 0; i < data.length; i++){
+			if (data.length == i + 1)
+				query = query + data[i].id + ')'
+				+ '';
+			else
+				query = query + data[i].id + ',';
+		}
+		query = query + ` UNION ALL SELECT user_id, path, NULL, NULL, NULL, NULL FROM images WHERE main=TRUE AND user_id IN (`;
+		for (var i = 0; i < data.length; i++){
+			if (data.length == i + 1)
+				query = query + data[i].id + ')';
+			else
+				query = query + data[i].id + ',';
+		}
+		query = query + ` UNION ALL SELECT NULL, NULL, NULL, tags, user_id::text, NULL FROM user_tags WHERE user_id IN (`;
+		for (var i = 0; i < data.length; i++){
+			if (data.length == i + 1)
+				query = query + data[i].id + ')';
+			else
+				query = query + data[i].id + ',';
+		}
+		query = query + ` AND tags IN (SELECT tags FROM user_tags WHERE user_id=$(uId))
+						UNION SELECT NULL, NULL, NULL, NULL, NULL, block_for::text FROM users_block WHERE user_id=$(uId) AND block_for IN (`;
+		for (var i = 0; i < data.length; i++){
+			if (data.length == i + 1)
+				query = query + data[i].id + ')';
+			else
+				query = query + data[i].id + ',';
+		}
+		return query;
+	},
+	getBlockedUsers: (response, id) => {
+		for (var y = 0; y < response.length; y++)
+			if (response[y].blocked == id)
+				return 0;
+		return 1;
+	},
+	getPop: (response, id) => {
+		var pop = 0;
+		for (var i = 0; i < response.length; i++) {
+			if (id == response[i].like_for)
+				pop++;
+		}
+		return pop;
+	},
+	getTags: (response, id) => {
+		var tags = [];
+		for (var i = 0; i < response.length; i++)
+			if (id == response[i].user_id_tag)
+				tags.push(response[i].tags);
+		return tags;
+	},
+	getValue: (profil) => {
+		var value = 0;
+		value = -profil.dist + profil.pop * 5 + profil.tags.length * 10;
+		return value;
+	},
+	getInterestingProfiles: (req, res) => {
+		var profils = [];
+		if (!req.session.sex) {
+			res.render('home', {profils: profils});
 			return ;
 		}
+		var query = module.exports.buildFirstQuery(req);
 		req.db.many(query, req.session)
 		.then(data => {
-			query = `SELECT user_id, path FROM images WHERE main=TRUE AND user_id IN (`;
-			for (var i = 0; i < data.length; i++){
-				if (data.length == i + 1)
-					query = query + data[i].id + ')';
-				else
-					query = query + data[i].id + ',';
-			}
-			req.db.many(query)
+			query = module.exports.buildSecondQuery(data);
+			req.db.many(query, req.session)
 			.then(response => {
 				for (var i = 0; i < data.length; i++) {
-					for (var y = 0; y < response.length; y++) {
-						if (response[y].user_id == data[i].id) {
-							console.log(tools.getDist(Math.cos(data[i].latitude) * Math.cos(data[i].longitude),
-												Math.cos(data[i].latitude) * Math.sin(data[i].longitude),
-												Math.sin(data[i].latitude),
-												Math.cos(req.session.latitude) * Math.cos(req.session.longitude),
-												Math.cos(req.session.latitude) * Math.sin(req.session.longitude),
-												Math.sin(req.session.latitude)), 'AAAAAA')
-							profils.push({
-								login: data[i].login,
-								id: data[i].id,
-								sex: data[i].sex,
- 								age: tools.getAge(data[i].birth),
- 								dist: tools.getDist(Math.cos(data[i].latitude) * Math.cos(data[i].longitude),
-												Math.cos(data[i].latitude) * Math.sin(data[i].longitude),
-												Math.sin(data[i].latitude),
-												Math.cos(req.session.latitude) * Math.cos(req.session.longitude),
-												Math.cos(req.session.latitude) * Math.sin(req.session.longitude),
-												Math.sin(req.session.latitude)),
- 								path: response[i].path
-							});
-
-							break ;
+					if (module.exports.getBlockedUsers(response, data[i].id)) {
+						for (var y = 0; y < response.length; y++) {
+							if (response[y].user_id == data[i].id) {
+								profils.push({
+									login: data[i].login,
+									id: data[i].id,
+									sex: data[i].sex,
+	 								age: tools.getAge(data[i].birth),
+	 								dist: tools.getDist(data[i].latitude, data[i].longitude,
+										req.session.latitude, req.session.longitude),
+	 								path: response[y].path,
+	 								pop: module.exports.getPop(response, response[y].user_id),
+	 								tags: module.exports.getTags(response, response[y].user_id),
+	 								value: 0
+								});
+								break ;
+							}
+							else if (y + 1 == response.length) {
+								profils.push({
+									login: data[i].login,
+									id: data[i].id,
+									sex: data[i].sex,
+									dist: tools.getDist(data[i].latitude, data[i].longitude,
+										req.session.latitude, req.session.longitude),
+	 								age: tools.getAge(data[i].birth),
+	 								path: '/images/profile.png',
+	 								pop: module.exports.getPop(response, data[i].id),
+	 								tags: module.exports.getTags(response, data[i].id),
+	 								value: 0
+								});
+							}
 						}
-						else if (y + 1 == response.length) {
-							console.log(tools.getDist(Math.cos(data[i].latitude) * Math.cos(data[i].longitude),
-												Math.cos(data[i].latitude) * Math.sin(data[i].longitude),
-												Math.sin(data[i].latitude),
-												Math.cos(req.session.latitude) * Math.cos(req.session.longitude),
-												Math.cos(req.session.latitude) * Math.sin(req.session.longitude),
-												Math.sin(req.session.latitude)), 'AAAAAA')
-							profils.push({
-								login: data[i].login,
-								id: data[i].id,
-								sex: data[i].sex,
-								dist: tools.getDist(Math.cos(data[i].latitude) * Math.cos(data[i].longitude),
-												Math.cos(data[i].latitude) * Math.sin(data[i].longitude),
-												Math.sin(data[i].latitude),
-												Math.cos(req.session.latitude) * Math.cos(req.session.longitude),
-												Math.cos(req.session.latitude) * Math.sin(req.session.longitude),
-												Math.sin(req.session.latitude)),
- 								age: tools.getAge(data[i].birth)
-							});
-						}
+						console.log('AA', profils[i])
+						profils[i].value = module.exports.getValue(profils[i]);
+						console.log('BB')
 					}
 				}
-				console.log(profils)
-				res.render('home', profils);
+				profils.sort(tools.compareByValue);
+				console.log(profils, 'test')
+				res.render('home', {profils: profils});
 			}).catch(err => {
-				console.log(err);
-				res.render('home');
+				console.log(err, 'test')
+				res.render('home', {profils: profils});
 			});
 		}).catch(err => {
-			console.log(err);
-			res.render('home');
+			res.render('home', {profils: profils});
 		});
 	}
 }

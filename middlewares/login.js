@@ -16,7 +16,7 @@ module.exports = {
 
 		req.db.one(query, req.body)
 		.then(function(data){
-			query = `UPDATE users SET last_log=CURRENT_TIMESTAMP WHERE id=$1`
+			query = `UPDATE users SET last_log=CURRENT_TIMESTAMP WHERE id=$1`;
 			if (tools.comparePasswd(req.body.password, data.passwd)){
 				req.session.uId = data.id;
 				req.session.sex_pref = data.sex_pref;

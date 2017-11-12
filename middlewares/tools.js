@@ -53,9 +53,23 @@ module.exports = {
 	comparePasswd: (password, hash) => {
 		return bcrypt.compareSync(password, hash);
 	},
-	getDist: (xA, yA, zA, xB, yB, zB) => {
-		console.log(xA, yA, zA, xB, yB, zB)
-		var dist = Math.acos( xA.xB+xB.yB+zA.zB) * 20000 / Math.PI;
-		return dist;
+	getDist: (latA, lngA, latB, lngB) => {
+		earth_radius = 6378137;			// Terre = sphère de 6378km de rayon
+		rlo1 = Math.PI * lngA / 180;	// CONVERSION
+		rla1 = Math.PI * latA / 180;
+		rlo2 = Math.PI * lngB / 180;
+		rla2 = Math.PI * latB / 180;
+		dlo = (rlo2 - rlo1) / 2;
+		dla = (rla2 - rla1) / 2;
+		a = (Math.sin(dla) * Math.sin(dla)) + Math.cos(rla1) * Math.cos(rla2) * (Math.sin(dlo) * Math.sin(dlo));
+		d = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+		return ((earth_radius * d / 1000).toFixed(3));
+	},
+	compareByValue: (a, b) => {
+		if (a.value > b.value)
+			return -1;
+		if (a.value < b.value)
+			return 1;
+		return 0;
 	}
 }

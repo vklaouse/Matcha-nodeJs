@@ -12,6 +12,7 @@ let like = require('./like.js');
 let report = require('./report.js');
 let accountState = require('./accountState.js');
 let whoWatchMe = require('./whoWatchMe.js');
+let messages = require('./messages.js');
 let error = require('./error.js');
 let tools = require('../middlewares/tools.js');
 let multer = require('multer');
@@ -62,6 +63,8 @@ module.exports = {
 		tag.delete(router, tools.isLog);
 
 		home.get(router, tools.isLog);
+
+		messages.get(router, tools.isLog);
 
 		logout.get(router, tools.isLog)
 

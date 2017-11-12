@@ -751,7 +751,7 @@ $(document).ready(function(){
 								response.data[i].sex = 'man blue';
 							else
 								response.data[i].sex = 'genderless';
-							$modalContent.append('<a href="/profile/'+ response.data[i].user_id +'" style="width:100%; margin-top: 5px;"><button class="ui basic button">'
+							$modalContent.append('<a href="/profile/'+ response.data[i].user_id +'"><button style="width:99%; margin-top: 5px;" class="ui basic button">'
 										+ '<div style="width:49%; float: left; text-align: left;">'
 										+ '<i class="big icon '+ response.data[i].sex +'"></i> '+ response.data[i].login +'</div>'
 										+ '<div style="width:49%; display:inline; float:right;">'
@@ -786,7 +786,7 @@ $(document).ready(function(){
 								response.data[i].sex = 'man blue';
 							else
 								response.data[i].sex = 'genderless';
-							$modalContent.append('<a style="width:100%; margin-top: 5px;" href="/profile/'+ response.data[i].user_id +'"><button class="ui basic button">'
+							$modalContent.append('<a href="/profile/'+ response.data[i].user_id +'"><button style="width:99%; margin-top: 5px;" class="ui basic button">'
 										+ '<div style="width:33%; float: left; text-align: left;">'
 										+ '<i class="big icon '+ response.data[i].sex +'"></i> '+ response.data[i].login +'</div>'
 										+ '<div style="width:33%; display:inline;">'
@@ -801,6 +801,19 @@ $(document).ready(function(){
 				}
 			}).always(function (){});			
 		});
+	}
+
+	/*
+	** Home.js
+	*/
+
+	var buildModalsContent = function() {
+
+		$('.modal-member').off('click').on('click', function(){
+			var id = '#'+$(this)[0].text;
+			$(id).modal('show');
+		});
+		
 	}
 
 	/*
@@ -840,6 +853,7 @@ $(document).ready(function(){
 		report();
 		whoLikeMe();
 		whoWatchMe();
+		buildModalsContent();
 	}
 
 	runAllJs();

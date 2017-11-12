@@ -125,7 +125,7 @@ block content
 										- if (user_tags[i])
 											tr
 												td
-													a(href="#") ##{user_tags[i]}
+													a ##{user_tags[i]}
 												td 
 													button(class="circular ui icon button del-tag")
 														i(class="trash outline icon")
@@ -140,7 +140,7 @@ block content
 											- if (tags[i])
 												tr
 													td 
-														a(href="#") ##{tags[i]}
+														a ##{tags[i]}
 		div(class="field")
 			div(class="ui one column segment doubling stackable grid container" style="text-align:center;")
 				div(id="map-edit-profile" style="height:500px; width:100%;" lat="#{from.lat}" long="#{from.longi}")

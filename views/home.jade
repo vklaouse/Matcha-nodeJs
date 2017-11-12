@@ -5,6 +5,54 @@ block content
 		div(class="ui container segment")
 			div(class="ui search focus")
 				div(class="ui icon input" style='width: 100%;')
-					input(class="prompt" type="text" placeholder="Recherche..." autocomplete="off")
+					input(class="prompt" type="text" placeholder="Recherche d'un membre..." autocomplete="off")
 					i(class="search icon")
-		
+	div(class="ui container segment")
+		div(class="ui four column segment doubling stackable grid container" style="text-align:center;")
+			div(class="column center-div")
+				| test
+			div(class="column center-div")
+				| test
+			div(class="column center-div")
+				| test
+			div(class="column center-div")
+				| test
+		- for (var i = 0; i < profils.length; i++)
+			div(class="ui card" style="display:inline-block; margin-left: 5%;")
+				a(class="image" href="/profile/#{profils[i].id}")
+					img(src="#{profils[i].path}")
+				div(class="content")
+					a(class="header modal-member" style="display:inline-block;")
+						- if (profils[i].sex == 'H')
+							i(class="man blue icon")
+						- else
+							i(class="woman pink icon")
+						| #{profils[i].login}
+					a(class="meta" style="float: right; display:inline-block;") 
+						| #{profils[i].pop}
+						i(class="heart red icon" style="margin-left: 3px;") 
+					div(class="meta")
+						a #{profils[i].age} ans
+						a(style="float: right;") #{profils[i].dist} km
+			div(class="ui modal" id="#{profils[i].login}")
+				div(class="header")
+					- if (profils[i].sex == 'H')
+						i(class="man blue icon")
+					- else
+						i(class="woman pink icon")
+					| #{profils[i].login}
+				div(class="image content")
+					div(class="ui medium image")
+						img(src="#{profils[i].path}")
+					div(class="description")
+						div(class="ui header")
+							|  Intérêts communs:
+						p
+							- for (var j = 0; j < profils[i].tags.length; j++)
+								a(style="margin: 4px;" class="ui label purple") ##{profils[i].tags[j]}
+				div(class="actions")
+					div(class="ui black deny button")
+						| Ignorer
+					a(class="ui positive right labeled icon button" href="/profile/#{profils[i].id}")
+						| Visiter son profil
+						i(class="checkmark icon")
