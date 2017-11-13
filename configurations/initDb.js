@@ -1,7 +1,7 @@
 const Promise = require('bluebird');
 
 module.exports = {
-	init: function(){
+	init: () => {
 		const initOptions = {
 			promiseLib: Promise
 		};

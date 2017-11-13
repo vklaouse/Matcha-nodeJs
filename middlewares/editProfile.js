@@ -38,9 +38,9 @@ module.exports = {
 				}
 				
 			}
-			res.render('editProfile', {from: from, img: img, tags: tags, user_tags: user_tags});
+			res.render('editProfile', {from: from, img: img, tags: tags, user_tags: user_tags, page: 'myAccount'});
 		}).catch(err => {
-			res.render('editProfile', {from: from, img: img, tags: tags, user_tags: user_tags});
+			res.render('editProfile', {from: from, img: img, tags: tags, user_tags: user_tags, page: 'myAccount'});
 		});
 
 	},

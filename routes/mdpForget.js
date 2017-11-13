@@ -1,13 +1,13 @@
 var middleware = require('../middlewares/mdpForget.js');
 
 module.exports = {
-	get: function(router, isNotLog){
-		router.get('/forget', isNotLog, function(req, res, next) {
-			res.render('mdpForget');
+	get: (router, isNotLog) => {
+		router.get('/forget', isNotLog, (req, res, next) => {
+			res.render('mdpForget', {page: 'mdpForget'});
 		});
 	},
-	post: function(router, isNotLog){
-		router.post('/forget', isNotLog, function(req, res, next) {
+	post: (router, isNotLog) => {
+		router.post('/forget', isNotLog, (req, res, next) => {
 			middleware.sendNewMdp(req, res);
 		});
 	}

@@ -46,7 +46,7 @@ module.exports = {
 				query = query + data[i].id + ',';
 		}
 		query = query + ` AND tags IN (SELECT tags FROM user_tags WHERE user_id=$(uId))
-						UNION SELECT NULL, NULL, NULL, NULL, NULL, block_for::text FROM users_block WHERE user_id=$(uId) AND block_for IN (`;
+						UNION ALL SELECT NULL, NULL, NULL, NULL, NULL, block_for::text FROM users_block WHERE user_id=$(uId) AND block_for IN (`;
 		for (var i = 0; i < data.length; i++){
 			if (data.length == i + 1)
 				query = query + data[i].id + ')';
@@ -84,7 +84,7 @@ module.exports = {
 	getInterestingProfiles: (req, res) => {
 		var profils = [];
 		if (!req.session.sex) {
-			res.render('home', {profils: profils});
+			res.render('home', {profils: profils, page: 'home'});
 			return ;
 		}
 		var query = module.exports.buildFirstQuery(req);
@@ -93,8 +93,10 @@ module.exports = {
 			query = module.exports.buildSecondQuery(data);
 			req.db.many(query, req.session)
 			.then(response => {
+				var cnt = -1;
 				for (var i = 0; i < data.length; i++) {
 					if (module.exports.getBlockedUsers(response, data[i].id)) {
+						cnt++;
 						for (var y = 0; y < response.length; y++) {
 							if (response[y].user_id == data[i].id) {
 								profils.push({
@@ -126,20 +128,16 @@ module.exports = {
 								});
 							}
 						}
-						console.log('AA', profils[i])
-						profils[i].value = module.exports.getValue(profils[i]);
-						console.log('BB')
+						profils[cnt].value = module.exports.getValue(profils[cnt]);
 					}
 				}
 				profils.sort(tools.compareByValue);
-				console.log(profils, 'test')
-				res.render('home', {profils: profils});
+				res.render('home', {profils: profils, page: 'home'});
 			}).catch(err => {
-				console.log(err, 'test')
-				res.render('home', {profils: profils});
+				res.render('home', {profils: profils, page: 'home'});
 			});
 		}).catch(err => {
-			res.render('home', {profils: profils});
+			res.render('home', {profils: profils, page: 'home'});
 		});
 	}
 }

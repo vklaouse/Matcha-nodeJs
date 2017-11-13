@@ -817,23 +817,37 @@ $(document).ready(function(){
 	}
 
 	/*
+	** Messages.js
+	*/
+
+
+
+	/*
 	** Socket.io
 	*/
 
 	socket.on('newuser', function(test){
-		console.log('coucou', test)
+		console.log('coucou')
 	});
 
 	/*
 	**
 	*/
 
-	var runAllJs = function() {
-		globalsVar = { tags: [], userTags: [], profileId: 0 };
-		$('.ui.dropdown').dropdown();
+	var subscribePage = function() {
 		subscribe();
+	};
+
+	var loginPage = function() {
 		login();
+	};
+
+	var mdpForgetPage = function() {
 		mdpForget();
+	};
+
+	var myAccountPage = function() {
+		$('.ui.dropdown').dropdown();
 		getMainPhoto();
 		delPhoto();
 		editProfile();
@@ -844,6 +858,9 @@ $(document).ready(function(){
 		disableAccountButton();
 		enableAccountButton();
 		deleteAccountButton();
+	};
+
+	var profilePage = function() {
 		googleMapProfile();
 		zoomImg();
 		like();
@@ -853,7 +870,41 @@ $(document).ready(function(){
 		report();
 		whoLikeMe();
 		whoWatchMe();
+	};
+
+	var acceuilPage = function() {
 		buildModalsContent();
+	};
+
+	var messagesPage = function() {
+
+	}
+
+	var runAllJs = function() {
+		globalsVar = { tags: [], userTags: [], profileId: 0 };
+		var page = $('.active-page').attr('page');
+		if (page == 'subscribe') {
+			subscribePage();
+		}
+		else if (page == 'login') {
+			loginPage();
+		}
+		else if (page == 'mdpForget') {
+			mdpForgetPage();
+		}
+		else if (page == 'myAccount') {
+			myAccountPage();
+		}
+		else if (page == 'profile') {
+			socket.emit('score');
+			profilePage();
+		}
+		else if (page == 'home') {
+			acceuilPage();
+		}
+		else if (page == 'messages') {
+			messagesPage();
+		}
 	}
 
 	runAllJs();

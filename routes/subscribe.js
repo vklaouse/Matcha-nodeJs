@@ -1,13 +1,13 @@
 var middleware = require('../middlewares/subscribe.js');
 
 module.exports = {
-	get: function(router, isNotLog){
-		router.get('/subscribe', isNotLog, function(req, res, next) {
-			res.render('subscribe');
+	get: (router, isNotLog) => {
+		router.get('/subscribe', isNotLog, (req, res, next) => {
+			res.render('subscribe', {page: 'subscribe'});
 		});
 	},
-	post: function(router, isNotLog){
-		router.post('/subscribe', isNotLog, function(req, res, next) {
+	post: (router, isNotLog) => {
+		router.post('/subscribe', isNotLog, (req, res, next) => {
 			middleware.createAccount(req, res);
 		});
 	}

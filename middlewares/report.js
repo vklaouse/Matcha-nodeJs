@@ -8,7 +8,7 @@ module.exports = {
 			subject: `Matcha report`,
 			html: `<h1>`+ req.body.report +`</h1>`
 		};
-		req.mail.sendMail(message, function(err, info){
+		req.mail.sendMail(message, (err, info) => {
 			if (!err)
 				res.send({status: `success`});
 			else

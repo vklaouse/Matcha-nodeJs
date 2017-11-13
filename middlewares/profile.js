@@ -92,13 +92,13 @@ module.exports = {
 				res.render('profile', {from: from, img: img, user_tags: user_tags,
 								main: main, exist: true, my_tags: my_tags,
 								mySelf: mySelf, likes: likes, watch: watch,
-								block: block, iLikeIt: iLikeIt});
+								block: block, iLikeIt: iLikeIt, page: 'profile'});
 			}
 			else
-				res.render('profile', {exist: false});
+				res.render('profile', {exist: false, page: 'profile'});
 		}).catch(err => {
 			console.log(err)
-			res.render('profile', {exist: false});
+			res.render('profile', {exist: false, page: 'profile'});
 		});
 	}
 }

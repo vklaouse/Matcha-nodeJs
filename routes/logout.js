@@ -1,8 +1,8 @@
 var middleware = require('../middlewares/logout.js');
 
 module.exports = {
-	get: function(router, isLog){
-		router.get('/logout', isLog, function(req, res, next) {
+	get: (router, isLog) => {
+		router.get('/logout', isLog, (req, res, next) => {
 			middleware.unsetSession(req, res);
 		});
 	}

@@ -1,13 +1,13 @@
 var middleware = require('../middlewares/profile.js');
 
 module.exports = {
-	getWithId: function(router, isLog){
-		router.get('/profile/:id', isLog, function(req, res, next) {
+	getWithId: (router, isLog) => {
+		router.get('/profile/:id', isLog, (req, res, next) => {
 			middleware.getProfile(req, res);
 		});
 	},
-	get: function(router, isLog){
-		router.get('/profile', isLog, function(req, res, next) {
+	get: (router, isLog) => {
+		router.get('/profile', isLog, (req, res, next) => {
 			req.params = {id: `` + req.session.uId};
 			middleware.getProfile(req, res);
 		});

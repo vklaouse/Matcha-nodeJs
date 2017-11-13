@@ -1,7 +1,7 @@
 const tools = require('./tools.js');
 
 module.exports = {
-	login: function(req, res){
+	login: (req, res) => {
 		if (tools.isAlphaNum(req.body.password) && tools.isMail(req.body.mail))
 			module.exports.logUser(req, res);
 		else {
@@ -11,11 +11,11 @@ module.exports = {
 			});
 		}
 	},
-	logUser: function(req, res){
+	logUser: (req, res) => {
 		var query = `SELECT * FROM users WHERE mail=$(mail) LIMIT 1`;
 
 		req.db.one(query, req.body)
-		.then(function(data){
+		.then((data) => {
 			query = `UPDATE users SET last_log=CURRENT_TIMESTAMP WHERE id=$1`;
 			if (tools.comparePasswd(req.body.password, data.passwd)){
 				req.session.uId = data.id;
@@ -35,7 +35,7 @@ module.exports = {
 				};
 				res.send(data);
 			}
-		}).catch(function(err){
+		}).catch((err) => {
 			var data = {
 				status : 'fail',
 				data : 'mail'

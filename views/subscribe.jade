@@ -2,7 +2,7 @@ extends layout
 
 block layout
 	block content
-	div
+	div(class="active-page" page='#{page}')
 		div(class='buttons-top-right')
 			a(class="ui inverted purple button" href="/") Connexion
 		div(class="ui middle aligned center aligned grid")

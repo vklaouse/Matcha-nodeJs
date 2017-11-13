@@ -1,7 +1,7 @@
 const nodemailer = require('nodemailer');
 
 module.exports = {
-	init: function(){
+	init: () => {
 		var smtpTransport = nodemailer.createTransport({
 					service: "Gmail",
 					auth: {

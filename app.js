@@ -47,4 +47,7 @@ app.set('views', path.join(__dirname, 'views'))
 // routes
 routes.initRoutes(app);
 
-module.exports = app;
+module.exports = {
+	app: app, 
+	session: session
+};

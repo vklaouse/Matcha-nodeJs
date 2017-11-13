@@ -19,7 +19,7 @@ let multer = require('multer');
 
 
 module.exports = {
-	initRoutes: function(router){
+	initRoutes: (router) => {
 		let storage =   multer.memoryStorage();
 		let upload = multer({ storage: storage })
 

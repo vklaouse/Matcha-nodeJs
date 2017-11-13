@@ -1,4 +1,11 @@
 extends layout
 
 block content
-	div(class='body-fixed-menu text-color')
+	div(class="ui left vertical menu" style="padding-top: 3rem; height: 100%;")
+		div(class="item")
+			img(class="ui mini image" src="/images/profile.png")
+		a(class="item") Features
+			button(class="ui button") Coucou
+		a(class="item") Testimonials
+		a(class="item") Sign-in
+	div(class='body-fixed-menu text-color active-page' page='#{page}')

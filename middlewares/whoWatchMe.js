@@ -6,13 +6,13 @@ module.exports = {
 					WHERE watch.watching=$(uId) AND users.id=watch.user_id`;
 		req.body.uId = req.session.uId;
 		req.db.many(query, req.body)
-		.then(function(data){
+		.then((data) => {
 			var data = {
 				status : 'success',
 				data: data
 			};
 			res.send(data);
-		}).catch(function(err){
+		}).catch((err) => {
 			var data = {
 				status : 'fail',
 				data : err
@@ -30,13 +30,13 @@ module.exports = {
 					WHERE likes.like_for=$(uId) AND users.id=likes.user_id`;
 		req.body.uId = req.session.uId;
 		req.db.many(query, req.body)
-		.then(function(data){
+		.then((data) => {
 			var data = {
 				status : 'success',
 				data: data
 			};
 			res.send(data);
-		}).catch(function(err){
+		}).catch((err) => {
 			var data = {
 				status : 'fail',
 				data : err

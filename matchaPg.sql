@@ -52,3 +52,10 @@ CREATE TABLE "users_block" (
 	"user_id" INT NOT NULL,
 	"block_for" INT NOT NULL
 );
+
+CREATE TABLE "messages" (
+	"send_by" INT NOT NULL,
+	"received_by" INT NOT NULL,
+	"date" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+	"content" VARCHAR NOT NULL
+);

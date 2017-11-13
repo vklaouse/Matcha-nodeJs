@@ -1,7 +1,7 @@
 const session = require('express-session');
 
 module.exports = {
-	init: function(){
+	init: () => {
 		return session({
 			secret: 'born2code',
 			resave: false,
