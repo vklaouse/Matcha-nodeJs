@@ -65,6 +65,7 @@ module.exports = {
 		home.get(router, tools.isLog);
 
 		messages.get(router, tools.isLog);
+		messages.post(router, tools.isLog);
 
 		logout.get(router, tools.isLog)
 

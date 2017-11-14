@@ -5,5 +5,10 @@ module.exports = {
 		router.get('/messages', isLog, (req, res, next) => {
 			middleware.messages(req, res);
 		});
+	},
+	post: (router, isLog) => {
+		router.post('/messages', isLog, (req, res, next) => {
+			middleware.getMessages(req, res);
+		});
 	}
 }

@@ -34,11 +34,21 @@ io.use(sharedsession(session, {
     autoSave:true
 }));
 io.sockets.on('connection', (socket) => {
-	socket.emit('newuser');
-	socket.on('score', function(test){
-		console.log(socket.handshake.sessionID)
-		// console.log("AAAA", socket.handshake.sessionStore.sessions)
-	});
+	if (socket.handshake.sessionStore.sessions[socket.handshake.sessionID]) {
+		console.log(socket.handshake.sessionID);
+		console.log(socket.handshake.sessionStore.sessions[socket.handshake.sessionID]);
+	}
+	
+	// if ()
+	// socket.emit('newuser');
+	// socket.on('score', function(test){
+	// 	console.log(socket.handshake.sessionID)
+	// 	// console.log("AAAA", socket.handshake.sessionStore.sessions)
+	// });
+	// socket.on('tchat', function(data){
+	// 	console.log(data)
+	// 	console.log("AAAA", socket.handshake.sessionStore.sessions)
+	// });
 	// socket.broadcast.emit(``, ``);
 	// socket.on(``, ``);
 

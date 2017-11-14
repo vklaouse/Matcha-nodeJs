@@ -820,7 +820,56 @@ $(document).ready(function(){
 	** Messages.js
 	*/
 
+	var checkAuthorizeId = function(id) {
+		for (var i = 0; i < globalsVar.matchId.length; i++) {
+			if (id == globalsVar.matchId[i])
+				return 1;
+		}
+		return 0;
+	}
 
+	var changeConv = function() {
+		var $id;
+		var $changeConv = $('.change-conv');
+		for (var i = 0; i < $changeConv.length;i++) {
+			$id = $('#' + $changeConv[i].id);		
+			globalsVar.matchId.push($changeConv[i].id)
+		}
+		for (var i = 0; i < globalsVar.matchId.length; i++) {
+			$('#' + globalsVar.matchId[i]).off('click').on('click', function() {
+				var id = $(this).attr('id');
+				if (checkAuthorizeId(id)) {
+					globalsVar.talkWith = id;
+					$.ajax({
+						type : 'post',
+						url : '/messages',
+						data : {report: globalsVar.talkWith},
+						dataType : 'json',
+						encode : true
+					}).done(function (response){
+					}).always(function (){});
+				}
+			});
+		}
+	}
+
+	var inputTchat = function() {
+		var $input = $('#tchat-input');
+		$input.off('keyup').on('keyup', function(e) {
+			if (e.keyCode == 13) {
+				tchat($input.val());
+				$input.val('');
+			}
+		});
+		$('#send-msg').off('click').on('click', function() {
+			tchat($input.val());
+			$input.val('');
+		});
+	}
+
+	var tchat = function(text) {
+		socket.emit('tchat', { text: text, id: globalsVar.talkWith });
+	}
 
 	/*
 	** Socket.io
@@ -877,11 +926,13 @@ $(document).ready(function(){
 	};
 
 	var messagesPage = function() {
-
+		changeConv();
+		inputTchat();
 	}
 
 	var runAllJs = function() {
-		globalsVar = { tags: [], userTags: [], profileId: 0 };
+		globalsVar = { tags: [], userTags: [],
+			profileId: 0, matchId: [], talkWith: 0 };
 		var page = $('.active-page').attr('page');
 		if (page == 'subscribe') {
 			subscribePage();

@@ -1,11 +1,18 @@
 extends layout
 
 block content
-	div(class="ui left vertical menu" style="padding-top: 3rem; height: 100%;")
-		div(class="item")
-			img(class="ui mini image" src="/images/profile.png")
-		a(class="item") Features
-			button(class="ui button") Coucou
-		a(class="item") Testimonials
-		a(class="item") Sign-in
-	div(class='body-fixed-menu text-color active-page' page='#{page}')
+	div(class="ui left vertical fixed menu" style="margin-top: 52px; padding-bottom: 52px; height: 100%; overflow-x: auto;")
+		- for (var i = 0; i < discussion.length; i++)
+			div(class="item change-conv" id="#{discussion[i].id}")
+				div( style="display: inline; width: 20%;")
+					img(style="display: inline;" class="ui image circular tiny" src="#{discussion[i].path}")
+				div(style="display: inline-block; text-align: center; width: 50%;")
+					a
+						h4(style="display: inline;") #{discussion[i].login}
+	div(class='body-fixed-menu text-color' style="margin-left: 15rem; height: inherit")
+		div(id="messages-div")
+			div(id="msg-display")
+				
+	div(class="ui bottom fixed menu fluid action input" style="padding-left: 17rem; padding-bottom: 1rem; padding-right: 2rem; z-index:1;background-color: #ebeff1; border:none;")
+		input(type="text" id="tchat-input" placeholder="Ecrivez un message...")
+		div(class="ui button" id="send-msg") Envoyer
