@@ -872,14 +872,6 @@ $(document).ready(function(){
 	}
 
 	/*
-	** Socket.io
-	*/
-
-	socket.on('newuser', function(test){
-		console.log('coucou')
-	});
-
-	/*
 	**
 	*/
 
