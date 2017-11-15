@@ -41,6 +41,11 @@ $(document).ready(function(){
 	** Tools
 	*/
 
+	var updateScroll = function(id) {
+		var element = document.getElementById(id);
+		element.scrollTop = element.scrollHeight;
+	}
+
 	var checkDoublonInArray = function(array, string) {
 		return $.inArray(string, array) < 0 ? 0 : 1;
 	}
@@ -203,8 +208,10 @@ $(document).ready(function(){
 						$('input[name="'+ response.data +'"]').invalidInput('Mauvais mot de passe.');
 					else if (response.status == 'fail')
 						loginFormIsValid(response.data);
-					else
+					else {
 						Turbolinks.visit('/home');
+						window.location.reload();
+					}
 				}).always(function (){
 					$loading.removeClass('loading');
 				});
@@ -834,19 +841,40 @@ $(document).ready(function(){
 		for (var i = 0; i < $changeConv.length;i++) {
 			$id = $('#' + $changeConv[i].id);		
 			globalsVar.matchId.push($changeConv[i].id)
+			globalsVar.convImg[$changeConv[i].id] = $changeConv[i].childNodes["0"].childNodes["0"].attributes[1].value;
 		}
 		for (var i = 0; i < globalsVar.matchId.length; i++) {
 			$('#' + globalsVar.matchId[i]).off('click').on('click', function() {
 				var id = $(this).attr('id');
+				$('.change-conv').removeClass('active');
+				$(this).addClass('active')
 				if (checkAuthorizeId(id)) {
 					globalsVar.talkWith = id;
 					$.ajax({
 						type : 'post',
 						url : '/messages',
-						data : {report: globalsVar.talkWith},
+						data : {id: globalsVar.talkWith},
 						dataType : 'json',
 						encode : true
 					}).done(function (response){
+						var $msgBoard = $('#msg-display');
+						$msgBoard.empty();
+						for (var i = 0; i < response.data.length; i++) {
+							console.log(response.data[i]);
+
+							if (response.data[i].received_by == globalsVar.talkWith 
+								|| response.data[i].send_by != globalsVar.talkWith) {
+								$msgBoard.append('<div style="text-align: right;"><div class="ui purple compact message msg" >'
+											+ response.data[i].content + '</div></div>');
+							}
+							else {
+								$msgBoard.append('<div><img class="ui image mini circular"'
+									+ ' style="display: inline; width:47px;" src="'+ globalsVar.convImg[response.data[i].send_by] +'"></img>'
+									+ '<div class="ui compact message msg" style="margin-left: 5px;">'
+									+ response.data[i].content + '</div></div>');
+							}
+						}
+						updateScroll('msg-display');
 					}).always(function (){});
 				}
 			});
@@ -868,8 +896,19 @@ $(document).ready(function(){
 	}
 
 	var tchat = function(text) {
+		$('#msg-display').append('<div style="text-align: right;"><div class="ui purple compact message msg" >'
+			+ text + '</div></div>');
 		socket.emit('tchat', { text: text, id: globalsVar.talkWith });
+		updateScroll('msg-display');
 	}
+
+	socket.on('send_msg', function(data) {
+		$('#msg-display').append('<div><img class="ui image mini circular"'
+			+ ' style="display: inline; width:47px;" src="'+ globalsVar.convImg[data.id] +'"></img>'
+			+ '<div class="ui compact message msg" style="margin-left: 5px;">'
+			+ data.msg + '</div></div>');
+		updateScroll('msg-display');
+	});
 
 	/*
 	**
@@ -924,7 +963,8 @@ $(document).ready(function(){
 
 	var runAllJs = function() {
 		globalsVar = { tags: [], userTags: [],
-			profileId: 0, matchId: [], talkWith: 0 };
+			profileId: 0, matchId: [], talkWith: 0,
+			convImg: {} };
 		var page = $('.active-page').attr('page');
 		if (page == 'subscribe') {
 			subscribePage();

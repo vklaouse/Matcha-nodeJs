@@ -64,6 +64,21 @@ module.exports = {
 		});
 	},
 	getMessages: (req, res) => {
-		
+		var query = `SELECT * FROM messages WHERE (send_by=$(uId) 
+					AND received_by=$(id)) OR (send_by=$(id) 
+					AND received_by=$(uId))`;
+		req.body.uId = req.session.uId;
+		req.db.many(query, req.body)
+		.then((data) => {
+			res.send({
+				status: 'success',
+				data: data
+			});
+		}).catch((err) => {
+			res.send({
+				status: 'fail',
+				data: err
+			});
+		});
 	}
 }

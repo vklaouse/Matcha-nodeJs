@@ -49,5 +49,6 @@ routes.initRoutes(app);
 
 module.exports = {
 	app: app, 
-	session: session
+	session: session,
+	db: db
 };
