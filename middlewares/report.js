@@ -6,7 +6,7 @@ module.exports = {
 			from: `matcha@gmail.com`,
 			to: `vivien.klaousen@laposte.net`,
 			subject: `Matcha report`,
-			html: `<h1>`+ req.body.report +`</h1>`
+			html: `<h1>`+ req.xssFilters.inHTMLData(req.body.report) +`</h1>`
 		};
 		req.mail.sendMail(message, (err, info) => {
 			if (!err)

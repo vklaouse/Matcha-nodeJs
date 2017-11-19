@@ -8,6 +8,7 @@ let appli = require('../app');
 let app = appli.app;
 let session = appli.session;
 let db = appli.db;
+let xssFilters = appli.xssFilters;
 let debug = require('debug')('matcha:server');
 let http = require('http');
 let sharedsession = require("express-socket.io-session");
@@ -40,23 +41,104 @@ io.sockets.on('connection', (socket) => {
 	if (socket.handshake.session.uId)
 		membersId[socket.handshake.session.uId] = socket.id;
 
+	socket.on('co', function(data){
+		var query = `SELECT last_log FROM users WHERE id=$(id)`;
+		if (membersId[data.id])
+			socket.emit('isCo');
+		else
+			db.one(query, data)
+			.then((data) => {
+				socket.emit('isntCo', data);
+			}).catch((err) => {});
+	});
+
 	socket.on('tchat', function(data){
 		var query = `INSERT INTO messages (send_by, received_by, content)
 			VALUES($(send_by), $(received_by), $(content))`;
+		var text = xssFilters.inHTMLData(data.text);
 		if (membersId[data.id]) {
-			io.to(membersId[data.id]).emit('send_msg', {msg: data.text, id: socket.handshake.session.uId });
+			io.to(membersId[data.id]).emit('send_msg', {msg: text, id: socket.handshake.session.uId });
 		}
 		db.none(query, {send_by: socket.handshake.session.uId, 
-				received_by: data.id, content: data.text});
+				received_by: data.id, content: text});
+	});
+
+	socket.on('like', function(data) {
+		if (data.id == socket.handshake.session.uId)
+			return ;
+		var query = `SELECT * FROM likes WHERE user_id=$(id) AND like_for=$(my_id)`;
+		var resp = {id: data.id, my_id: socket.handshake.session.uId};
+		
+		db.one(query, resp)
+		.then((res) => {
+			resp = {to_id: data.id, from_id: socket.handshake.session.uId,
+					content: "Vous venez d'etre like en retour"}
+			query = `INSERT INTO notif (user_id, notif_from, content) 
+				VALUES($(to_id), $(from_id), $(content))`;
+			db.none(query, resp)
+			.then(() => {
+				io.to(membersId[resp.to_id]).emit('likeNotif', resp);
+			}).catch((err) => {console.log(err)});
+
+		}).catch((err) => {
+			resp = {to_id: data.id, from_id: socket.handshake.session.uId,
+					content: "Vous venez d'etre like"}
+			query = `INSERT INTO notif (user_id, notif_from, content) 
+				VALUES($(to_id), $(from_id), $(content))`;
+			db.none(query, resp)
+			.then(() => {
+				io.to(membersId[resp.to_id]).emit('likeNotif', resp);
+			}).catch((err) => {console.log(err)});
+		});
+			
+	});
+
+	socket.on('unlike', function(data) {
+		if (data.id == socket.handshake.session.uId)
+			return ;
+		var resp = {to_id: data.id, from_id: socket.handshake.session.uId,
+				content: "Vous venez d'etre unlike"}
+		var query = `INSERT INTO notif (user_id, notif_from, content) 
+			VALUES($(to_id), $(from_id), $(content))`;
+		db.none(query, resp)
+		.then(() => {
+			io.to(membersId[resp.to_id]).emit('unlikeNotif', resp);
+		}).catch((err) => {console.log(err)});
+	});
+
+	socket.on('watch', function(data) {
+		if (data.id == socket.handshake.session.uId)
+			return ;
+		var resp = {to_id: data.id, from_id: socket.handshake.session.uId,
+				content: "Votre profil vient d'être consulté"}
+		var query = `INSERT INTO notif (user_id, notif_from, content) 
+			VALUES($(to_id), $(from_id), $(content))`;
+		db.none(query, resp)
+		.then(() => {
+			io.to(membersId[resp.to_id]).emit('watchNotif', resp);
+		}).catch((err) => {console.log(err)});
+	});
+
+	socket.on('message', function(data) {
+		if (data.id == socket.handshake.session.uId)
+			return ;
+		var resp = {to_id: data.id, from_id: socket.handshake.session.uId,
+				content: "Votre venez de recevoir un message"}
+		var query = `INSERT INTO notif (user_id, notif_from, content) 
+			VALUES($(to_id), $(from_id), $(content))`;
+		db.none(query, resp)
+		.then(() => {
+			io.to(membersId[resp.to_id]).emit('messageNotif', resp);
+		}).catch((err) => {console.log(err)});
+	});
+
+	socket.on('deco', function() {
+		delete membersId[socket.handshake.session.uId];
 	});
 
 	socket.on('disconnect', function() {
-		console.log('Bye ', socket.id);
+		delete membersId[socket.handshake.session.uId];
 	});
-
-	// socket.broadcast.emit(``, ``);
-	// socket.on(``, ``);
-
 });
 
 /**

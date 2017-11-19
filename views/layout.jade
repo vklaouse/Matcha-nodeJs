@@ -23,6 +23,10 @@ html
 					a(class="item white-color" href='/editProfile') Compte
 					a(class="item white-color" href='/messages') Messages
 					div(class="right menu")
+						a(href="#" class="ui right floated white-color dropdown item" id="notif" tabindex="0")
+							i(class="world icon")
+							div(class="menu transition hidden" tabindex="-1")
+							p(id="notif-nbr" style="position: absolute; bottom: 2px; right:2px; font-size: 10px;")
 						div(class="item")
-							a(class="ui inverted button" href='/logout') Deconnexion
+							a(class="ui inverted button" id="logout" href='/logout') Deconnexion
 		block content

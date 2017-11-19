@@ -30,15 +30,7 @@ block content
 											| #{likes}
 										div(class="ui red basic button" style="border-radius: .28571429rem; border-top-left-radius: 0; border-bottom-left-radius: 0")
 											i(class="heartbeat icon")
-								div(style="display:inline-block; float: right; margin-top:5px;")
-									- if (!mySelf)
-										p(style="text-align:right;")
-											i(class="circle green icon") 
-											| Connecté
-									- else
-										p(style="text-align:right;")
-											i(class="circle thin icon icon") 
-											| Derniere connexion
+								div(style="display:inline-block; float: right; margin-top:5px;" id="co")
 							div(style="margin-top: 15px;" id="other-buttons")
 								button(class="ui right labeled mini icon button" id="signal")
 									i(class="right send outline icon") 

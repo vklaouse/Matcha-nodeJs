@@ -50,5 +50,6 @@ routes.initRoutes(app);
 module.exports = {
 	app: app, 
 	session: session,
-	db: db
+	db: db,
+	xssFilters: xssFilters
 };

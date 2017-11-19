@@ -59,3 +59,9 @@ CREATE TABLE "messages" (
 	"date" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
 	"content" VARCHAR NOT NULL
 );
+
+CREATE TABLE "notif" (
+	"user_id" INT NOT NULL,
+	"notif_from" INT NOT NULL,
+	"content" VARCHAR NOT NULL
+);

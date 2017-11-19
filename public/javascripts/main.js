@@ -42,8 +42,17 @@ $(document).ready(function(){
 	*/
 
 	var updateScroll = function(id) {
-		var element = document.getElementById(id);
-		element.scrollTop = element.scrollHeight;
+		if (document.getElementById(id)) {
+			var element = document.getElementById(id);
+			element.scrollTop = element.scrollHeight;
+		}
+	}
+
+	var newNotif = function($n) {
+		if ($n.text())
+			$n.text(parseInt($n.text()) + 1);
+		else
+			$n.text(1);
 	}
 
 	var checkDoublonInArray = function(array, string) {
@@ -166,6 +175,17 @@ $(document).ready(function(){
 	}
 
 	/*
+	** Logout.js
+	*/
+
+	var logout = function() {
+		$('#logout').off('click').on('click', function() {
+			socket.emit('deco');
+		});
+		
+	}
+
+	/*
 	** Login.js
 	*/
 
@@ -209,7 +229,6 @@ $(document).ready(function(){
 					else if (response.status == 'fail')
 						loginFormIsValid(response.data);
 					else {
-						Turbolinks.visit('/home');
 						window.location.reload();
 					}
 				}).always(function (){
@@ -581,6 +600,7 @@ $(document).ready(function(){
 			dataType : 'json',
 			encode : true
 		}).done(function (response){
+			socket.emit('deco');
 			Turbolinks.visit('/logout');
 		}).always(function (){});
 	}
@@ -646,6 +666,7 @@ $(document).ready(function(){
 					$('#like > div').removeClass('basic');
 					$('#like').addClass('heartbeat');
 					dislike();
+					socket.emit('like', {id: globalsVar.profileId});
 				}
 			}).always(function (){});
 		});
@@ -666,6 +687,7 @@ $(document).ready(function(){
 						$('#like > div').addClass('basic');
 						$('#like').removeClass('heartbeat');
 						like();
+						socket.emit('unlike', {id: globalsVar.profileId});
 					}
 				}).always(function (){});
 			});
@@ -810,6 +832,23 @@ $(document).ready(function(){
 		});
 	}
 
+	var connect = function() {
+		socket.emit('co', {id: globalsVar.profileId});
+	}
+
+	socket.on('isCo', function() {
+		$('#co').empty();
+		$('#co').append('<p style="text-align:right;"><i class="circle green icon">'
+						+ '</i>Connecté</p>');
+	});
+
+	socket.on('isntCo', function(data) {
+		$('#co').empty();
+		$('#co').append('<p style="text-align:right;"><i class="circle thin icon icon">'
+						+ '</i> '+ moment(data.last_log).format('DD/MM/YYYY [à] HH:mm') +'</p>');
+		console.log('test2');
+	});
+
 	/*
 	** Home.js
 	*/
@@ -860,8 +899,6 @@ $(document).ready(function(){
 						var $msgBoard = $('#msg-display');
 						$msgBoard.empty();
 						for (var i = 0; i < response.data.length; i++) {
-							console.log(response.data[i]);
-
 							if (response.data[i].received_by == globalsVar.talkWith 
 								|| response.data[i].send_by != globalsVar.talkWith) {
 								$msgBoard.append('<div style="text-align: right;"><div class="ui purple compact message msg" >'
@@ -883,22 +920,35 @@ $(document).ready(function(){
 
 	var inputTchat = function() {
 		var $input = $('#tchat-input');
-		$input.off('keyup').on('keyup', function(e) {
-			if (e.keyCode == 13) {
-				tchat($input.val());
-				$input.val('');
-			}
-		});
-		$('#send-msg').off('click').on('click', function() {
-			tchat($input.val());
-			$input.val('');
-		});
+			$input.off('keyup').on('keyup', function(e) {
+				if (e.keyCode == 13) {
+					if (globalsVar.talkWith) {
+						tchat($input.val());
+						$input.val('');
+					}
+					else
+						$('#tchat-input').val('');
+				}
+			});
+			$('#send-msg').off('click').on('click', function() {
+				if (globalsVar.talkWith) {
+					tchat($input.val());
+					$input.val('');
+				}
+				else
+					$('#tchat-input').val('');
+			});
 	}
 
 	var tchat = function(text) {
-		$('#msg-display').append('<div style="text-align: right;"><div class="ui purple compact message msg" >'
-			+ text + '</div></div>');
+		var $text = document.createTextNode(text);
+		var $p1 = $('<div style="text-align: right;"></div>');
+		var $p2 = $('<div class="ui purple compact message msg" ></div>');
+		$p2.append($text);
+		$p1.append($p2);
+		$('#msg-display').append($p1);
 		socket.emit('tchat', { text: text, id: globalsVar.talkWith });
+		socket.emit('message', {id: globalsVar.talkWith});
 		updateScroll('msg-display');
 	}
 
@@ -908,6 +958,26 @@ $(document).ready(function(){
 			+ '<div class="ui compact message msg" style="margin-left: 5px;">'
 			+ data.msg + '</div></div>');
 		updateScroll('msg-display');
+	});
+
+	/*
+	** Notif.js
+	*/
+
+	socket.on('unlikeNotif', function() {
+		newNotif($('#notif-nbr'));
+	});
+
+	socket.on('likeNotif', function() {
+		newNotif($('#notif-nbr'));
+	});
+
+	socket.on('watchNotif', function() {
+		newNotif($('#notif-nbr'));
+	});
+
+	socket.on('messageNotif', function() {
+		newNotif($('#notif-nbr'));
 	});
 
 	/*
@@ -927,7 +997,6 @@ $(document).ready(function(){
 	};
 
 	var myAccountPage = function() {
-		$('.ui.dropdown').dropdown();
 		getMainPhoto();
 		delPhoto();
 		editProfile();
@@ -950,6 +1019,8 @@ $(document).ready(function(){
 		report();
 		whoLikeMe();
 		whoWatchMe();
+		connect();
+		socket.emit('watch', {id: globalsVar.profileId});
 	};
 
 	var acceuilPage = function() {
@@ -966,6 +1037,8 @@ $(document).ready(function(){
 			profileId: 0, matchId: [], talkWith: 0,
 			convImg: {} };
 		var page = $('.active-page').attr('page');
+		$('.ui.dropdown').dropdown();
+		logout();
 		if (page == 'subscribe') {
 			subscribePage();
 		}
