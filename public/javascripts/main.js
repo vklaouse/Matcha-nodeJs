@@ -980,6 +980,59 @@ $(document).ready(function(){
 		newNotif($('#notif-nbr'));
 	});
 
+	var getNbrNotifNotRead = function() {
+		$.ajax({
+			type : 'post',
+			url : '/notif',
+			data : {},
+			dataType : 'json',
+			encode : true
+		}).done(function (response){
+			if (response.status == 'success')
+				$('#notif-nbr').text(response.data);
+		}).always(function (){});
+	}
+
+	var buildDropDownNotif = function() {
+		var $notif = $('#notif');
+		$.ajax({
+			type : 'post',
+			url : '/getNotif',
+			data : {del: false},
+			dataType : 'json',
+			encode : true
+		}).done(function (response){
+			if (response.status == 'success') {
+				var $newNotif = $('#notif > .menu');
+				$newNotif.empty();
+				for (var i = 0; i < response.data.length; i++) {
+					$newNotif.prepend('<div class="item">'+ response.data[i].content +'</div>')
+				}
+			}
+			
+		}).always(function (){});
+		$notif.off('click').on('click', function() {
+			$.ajax({
+				type : 'post',
+				url : '/getNotif',
+				data : {del: true},
+				dataType : 'json',
+				encode : true
+			}).done(function (response){
+				if (response.status == 'success') {
+					var $newNotif = $('#notif > .menu');
+					$newNotif.empty();
+					for (var i = 0; i < response.data.length; i++) {
+						$newNotif.prepend('<div class="item">'+ response.data[i].content +'</div>')
+					}
+					$('#notif-nbr').text('');
+				}
+				
+			}).always(function (){});
+		});
+		
+	}
+
 	/*
 	**
 	*/
@@ -1036,6 +1089,8 @@ $(document).ready(function(){
 		globalsVar = { tags: [], userTags: [],
 			profileId: 0, matchId: [], talkWith: 0,
 			convImg: {} };
+		getNbrNotifNotRead();
+		buildDropDownNotif();
 		var page = $('.active-page').attr('page');
 		$('.ui.dropdown').dropdown();
 		logout();

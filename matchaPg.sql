@@ -63,5 +63,5 @@ CREATE TABLE "messages" (
 CREATE TABLE "notif" (
 	"user_id" INT NOT NULL,
 	"notif_from" INT NOT NULL,
-	"content" VARCHAR NOT NULL
+	"content" VARCHAR NOT NULL,
 );

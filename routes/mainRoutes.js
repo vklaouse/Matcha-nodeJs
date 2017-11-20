@@ -13,6 +13,7 @@ let report = require('./report.js');
 let accountState = require('./accountState.js');
 let whoWatchMe = require('./whoWatchMe.js');
 let messages = require('./messages.js');
+let notif = require('./notif.js');
 let error = require('./error.js');
 let tools = require('../middlewares/tools.js');
 let multer = require('multer');
@@ -66,6 +67,9 @@ module.exports = {
 
 		messages.get(router, tools.isLog);
 		messages.post(router, tools.isLog);
+
+		notif.post(router, tools.isLog);
+		notif.getNotif(router, tools.isLog);
 
 		logout.get(router, tools.isLog)
 
