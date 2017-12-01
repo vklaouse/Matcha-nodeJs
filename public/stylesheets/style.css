@@ -163,6 +163,12 @@ body > .little {
 	padding: 1rem;
 }
 
+.colum {
+	width: 25%;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
 .msg {
 	border-radius: 2rem !important;
 	margin-bottom: 5px !important;

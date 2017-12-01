@@ -2,39 +2,47 @@ extends layout
 
 block content
 	div(class='body-fixed-menu text-color')
-		div(class="ui container segment")
-			div(class="ui search focus")
-				div(class="ui icon input" style='width: 100%;')
-					input(class="prompt" type="text" placeholder="Recherche d'un membre..." autocomplete="off")
-					i(class="search icon")
-	div(class="ui container segment")
+	div(class="ui container segment prof")
 		div(class="ui four column segment doubling stackable grid container" style="text-align:center;")
 			div(class="column center-div")
-				| test
+				input(id="min-age" class="input-out-form" style="width: 40%; float: left" placeholder="Age min...")
+				input(id="max-age" class="input-out-form" style="width: 40%" placeholder="Age max...")
 			div(class="column center-div")
-				| test
+				input(id="min-dist" class="input-out-form" style="width: 40%; float: left" placeholder="Distance min...")
+				input(id="max-dist" class="input-out-form" style="width: 40%" placeholder="Distance max...")
 			div(class="column center-div")
-				| test
+				input(id="min-pop" class="input-out-form" style="width: 40%; float: left" placeholder="Popularité min...")
+				input(id="max-pop" class="input-out-form" style="width: 40%" placeholder="Popularité max...")
 			div(class="column center-div")
-				| test
+				input(id="min-tag" class="input-out-form" style="width: 40%; float: left" placeholder="Points communs min...")
+				input(id="max-tag" class="input-out-form" style="width: 40%" placeholder="Points communs max...")
+		div(class="ui four column segment doubling stackable grid container" style="text-align:center;")
+			div(class="colum")
+				button(class="ui button inverted green" id="tri-age" style="width:100%;") Age
+			div(class="colum")
+				button(class="ui button inverted blue" id="tri-dist" style="width:100%;") Distance
+			div(class="colum")
+				button(class="ui button inverted red" id="tri-pop" style="width:100%;") Popularité
+			div(class="colum")
+				button(class="ui button inverted purple" id="tri-tags" style="width:100%;") Tags
 		- for (var i = 0; i < profils.length; i++)
-			div(class="ui card" style="display:inline-block; margin-left: 5%;")
+			div(class="ui del card" style="display:inline-block; margin-left: 5%;")
 				a(class="image" href="/profile/#{profils[i].id}")
 					img(src="#{profils[i].path}")
-				div(class="content")
-					a(class="header modal-member" style="display:inline-block;")
+				div(class="content" login="#{profils[i].login}")
+					a(class="header modal-member" login="#{profils[i].login}" style="display:inline-block;")
 						- if (profils[i].sex == 'H')
-							i(class="man blue icon")
+							i(class="man sex blue icon" sex="man")
 						- else
-							i(class="woman pink icon")
+							i(class="woman sex pink icon" sex="woman")
 						| #{profils[i].login}
-					a(class="meta" style="float: right; display:inline-block;") 
+					a(class="meta pop" pop="#{profils[i].pop}" style="float: right; display:inline-block;") 
 						| #{profils[i].pop}
 						i(class="heart red icon" style="margin-left: 3px;") 
 					div(class="meta")
-						a #{profils[i].age} ans
+						a(class="age" age="#{profils[i].age}" dist="#{profils[i].dist}") #{profils[i].age} ans
 						a(style="float: right;") #{profils[i].dist} km
-			div(class="ui modal" id="#{profils[i].login}")
+			div(class="ui del modal" id="#{profils[i].login}")
 				div(class="header")
 					- if (profils[i].sex == 'H')
 						i(class="man blue icon")
@@ -49,7 +57,7 @@ block content
 							|  Intérêts communs:
 						p
 							- for (var j = 0; j < profils[i].tags.length; j++)
-								a(style="margin: 4px;" class="ui label purple") ##{profils[i].tags[j]}
+								a(style="margin: 4px;" class="ui label purple tags" test="#{profils[i].tags[j]}") ##{profils[i].tags[j]}
 				div(class="actions")
 					div(class="ui black deny button")
 						| Ignorer

@@ -39,7 +39,7 @@ module.exports = {
 			users (name, first_name, birth,
 				login, mail, passwd,
 				sex, sex_pref, bio,
-				latitude, longitude, ip) 
+				latitude, longitude, ip)
 			values ($(name), $(first_name), $(birth),
 				$(login), $(mail), $(password),
 				$(sex), $(sex_pref), $(bio),

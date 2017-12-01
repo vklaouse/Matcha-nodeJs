@@ -133,16 +133,28 @@ $(document).ready(function(){
 	}
 
 	// Get and ajax the form subscribe.
+
+	var getPos = function(position) {
+		globalsVar.lat = position.coords.latitude;
+		globalsVar.lng = position.coords.longitude;
+	} 
+
 	var subscribe = function () {
 		$('#subscribe-submit').off('click').on('click', function(e){
 			e.preventDefault();
 			var data = {
 				login: null, name: null, first_name: null, birth: null, mail: null,
-				mail_confirm: null, password: null, password_confirm: null
+				mail_confirm: null, password: null, password_confirm: null,
+				longitude: null, latitude: null
 			};
 			var $subscribeForm = $('#subscribe input');
 			var $loading = $('#subscribe .stacked');
 
+			if(navigator.geolocation) {
+  				navigator.geolocation.getCurrentPosition(getPos);
+  				data.longitude = globalsVar.lng;
+  				data.latitude = globalsVar.lat;
+			}
 			$subscribeForm.each(function (){
 				data[this.name] = this.value;
 			});
@@ -342,7 +354,6 @@ $(document).ready(function(){
 		$('#edit-profile-form input').removeClass('invalid-input');
 		$('.error').removeClass('error');
 		$('.err-message').addClass('error');
-		console.log(data)
 		if (!isAlphaNum(data.name))
 			$('input[name="name"]').invalidInput('Nom invalide.', $form, 1);
 		if (!isAlphaNum(data.first_name))
@@ -351,7 +362,6 @@ $(document).ready(function(){
 			$('input[name="mail"]').invalidInput('Mail invalide.', $form, 1);
 			$('input[name="mail_confirm"]').invalidInput('', $form, 1);
 		}
-		console.log(isAlphaNum(data.passwd));
 		if ((isAlphaNum(data.passwd) == 0 && data.passwd.length != 0)
 			|| (isAlphaNum(data.passwd) == true && data.passwd != data.passwd_confirm) 
 			|| (isAlphaNum(data.passwd) == true && data.passwd.length < 7)){
@@ -846,21 +856,230 @@ $(document).ready(function(){
 		$('#co').empty();
 		$('#co').append('<p style="text-align:right;"><i class="circle thin icon icon">'
 						+ '</i> '+ moment(data.last_log).format('DD/MM/YYYY [à] HH:mm') +'</p>');
-		console.log('test2');
 	});
 
 	/*
 	** Home.js
 	*/
 
-	var buildModalsContent = function() {
-
-		$('.modal-member').off('click').on('click', function(){
-			var id = '#'+$(this)[0].text;
-			$(id).modal('show');
+	var getDataProfiles = function() {
+		$(".card").each(function(index) {
+			var $this = $(this);
+			globalsVar.profiles.push({
+				path: $this.find("img").attr('src'), id: $this.find(".image").attr('href'),
+				sex: $this.find(".sex").attr('sex'), login: $this.find(".content").attr('login'),
+				age: $this.find(".age").attr('age'), loc: $this.find(".age").attr('dist'),
+				pop: $this.find(".pop").attr('pop'), tag: [],
+				index: index
+			});
+			$("#" + globalsVar.profiles[index].login).find('.tags').each(function() {
+				globalsVar.profiles[index].tag.push($($(this)[0]).attr('test'));
+			});
+			globalsVar.profilesFiltered = globalsVar.profiles;
 		});
-		
 	}
+
+	var constructHome = function(data) {
+		var profile = `<div class="ui del card" style="display:inline-block; margin-left: 5%;">
+			<a class="image" href="`+ data.id +`">
+				<img src="`+ data.path +`"></img>
+			</a>
+			<div class="content" login="`+ data.login +`">
+				<a class="header modal-member" login="`+ data.login +`" style="display:inline-block;">
+					<i class="`+ data.sex +` sex `+ (data.sex == "man"? "blue" : "pink" ) +` icon" sex="`+ data.sexe +`"></i>
+					`+ data.login +`
+				<a class="meta pop" pop="`+ data.pop +`" style="float: right; display:inline-block;">
+					`+ data.pop +`
+					<i class="heart red icon" style="margin-left: 3px;"></i>
+				</a>
+				<div class="meta">
+					<a class="age" age="`+ data.age +`" dist="`+ data.loc +`"> `+ data.age +` ans</a>
+					<a style="float: right;"> `+ data.loc +` km </a>
+				</div>
+			</div>
+		</div>
+		<div class="ui del modal" id="`+ data.login +`">
+			<div class="header">
+				<i class="`+ data.sex +` sex `+ (data.sex == "man"? "blue" : "pink" ) +` icon" sex="`+ data.sexe +`"></i>
+				`+ data.login +`
+			</div>
+			<div class="image content">
+				<div class="ui medium image">
+					<img src="`+ data.path +`"></img>
+				</div>
+				<div class="description">
+					<div class="ui header">
+						Intérêts communs:
+					</div>
+					<p>`;
+		for (var i = 0; i < data.tag.length; i++)
+			profile = profile +	`<a style="margin: 4px;" class="ui label purple tags" test="`+ data.tag[i] +`"> #`+ data.tag[i] +` </a>`
+		profile = profile + `</p>
+				</div>
+			</div>
+			<div class="actions">
+				<div class="ui black deny button">
+					Ignorer
+				</div>
+				<a class="ui positive right labeled icon button" href="`+ data.id +`">
+					Visiter son profil
+					<i class="checkmark icon"></i>
+				</a>
+			</div>
+		</div>`;
+		$('.prof').append(profile);
+	}
+
+	var buildModalsContent = function(Id = null) {
+		$('.modal-member').off('click').on('click', function(){
+			if (!Id) {
+				var id = '#'+$(this).attr("login");
+				$(id).modal('show');
+			}
+			else
+				$("#"+ Id).modal('show');
+		});
+	}
+
+	var sortByAge = function(a, b) {
+		if (parseInt(a.age) > parseInt(b.age))
+			return 1;
+		if (parseInt(a.age) < parseInt(b.age))
+			return -1;
+		return 0;
+	}
+	var sortByDist = function(a, b) {
+		if (parseInt(a.loc) > parseInt(b.loc))
+			return 1;
+		if (parseInt(a.loc) < parseInt(b.loc))
+			return -1;
+		return 0;
+	}
+	var sortByTags = function(a, b) {
+		if (a.tag.length > b.tag.length)
+			return -1;
+		if (a.tag.length < b.tag.length)
+			return 1;
+		return 0;
+	}
+	var sortByPop = function(a, b) {
+		if (a.pop > b.pop)
+			return -1;
+		if (a.pop < b.pop)
+			return 1;
+		return 0;
+	}
+
+	var triProfiles = function() {
+		$('#tri-age').off('click').on('click', function() {
+			globalsVar.profilesFiltered.sort(sortByAge);
+			$('.del').remove();
+			for (var i = 0; i < globalsVar.profilesFiltered.length; i++) {
+				constructHome(globalsVar.profilesFiltered[i]);
+			}
+			buildModalsContent();
+		});
+
+		$('#tri-dist').off('click').on('click', function() {
+			globalsVar.profilesFiltered.sort(sortByDist);
+			$('.del').remove();
+			for (var i = 0; i < globalsVar.profilesFiltered.length; i++) {
+				constructHome(globalsVar.profilesFiltered[i]);
+			}
+			buildModalsContent();
+		});
+
+		$('#tri-pop').off('click').on('click', function() {
+			globalsVar.profilesFiltered.sort(sortByPop);
+			$('.del').remove();
+			for (var i = 0; i < globalsVar.profilesFiltered.length; i++) {
+				constructHome(globalsVar.profilesFiltered[i]);
+			}
+			buildModalsContent();
+		});
+
+		$('#tri-tags').off('click').on('click', function() {
+			globalsVar.profilesFiltered.sort(sortByTags);
+			$('.del').remove();
+			for (var i = 0; i < globalsVar.profilesFiltered.length; i++) {
+				constructHome(globalsVar.profilesFiltered[i]);
+			}
+			buildModalsContent();
+		});
+	}
+
+	var filterProfiles = function() {
+		var minAge;
+		$('#min-age').off('keyup').on('keyup', function() {
+			clearTimeout(minAge);
+			minAge = setTimeout(function() {
+				console.log('#min-age');
+			}, 250);
+		});
+		var maxAge;
+		$('#max-age').off('keyup').on('keyup', function() {
+			clearTimeout(maxAge);
+			maxAge = setTimeout(function() {
+				console.log('#max-age');
+			}, 250);
+		});
+
+		var minDist;
+		$('#min-dist').off('keyup').on('keyup', function() {
+			clearTimeout(minDist);
+			minDist = setTimeout(function() {
+				console.log('#min-dist');
+			}, 250);
+		});
+		var maxDist;
+		$('#max-dist').off('keyup').on('keyup', function() {
+			clearTimeout(maxDist);
+			maxDist = setTimeout(function() {
+				console.log('#max-dist');
+			}, 250);
+		});
+
+		var minPop;
+		$('#min-pop').off('keyup').on('keyup', function() {
+			clearTimeout(minPop);
+			minPop = setTimeout(function() {
+				console.log('#min-pop');
+			}, 250);
+		});
+		var maxPop;
+		$('#max-pop').off('keyup').on('keyup', function() {
+			clearTimeout(maxPop);
+			maxPop = setTimeout(function() {
+				console.log('#max-pop');
+			}, 250);
+		});
+
+		var minTag;
+		$('#min-tag').off('keyup').on('keyup', function() {
+			clearTimeout(minTag);
+			minTag = setTimeout(function() {
+				console.log('#min-tag');
+			}, 250);
+		});
+		var maxTag;
+		$('#max-tag').off('keyup').on('keyup', function() {
+			clearTimeout(maxTag);
+			maxTag = setTimeout(function() {
+				console.log('#max-tag');
+			}, 250);
+		});
+	}
+
+	var typingTimer;
+		$('#add-tag').off('keyup').on('keyup', function(e){
+			var $this = $(this);
+			$this.removeClass('input-error-out-form');
+			clearTimeout(typingTimer);
+			if (e.keyCode == 13)
+				registerTags($this);
+			else
+				typingTimer = setTimeout(function() {searchTags($this);}, 250);
+		});
 
 	/*
 	** Messages.js
@@ -953,34 +1172,40 @@ $(document).ready(function(){
 	}
 
 	socket.on('send_msg', function(data) {
-		$('#msg-display').append('<div><img class="ui image mini circular"'
-			+ ' style="display: inline; width:47px;" src="'+ globalsVar.convImg[data.id] +'"></img>'
-			+ '<div class="ui compact message msg" style="margin-left: 5px;">'
-			+ data.msg + '</div></div>');
-		updateScroll('msg-display');
+		if (globalsVar.talkWith == data.id) {
+			$('#msg-display').append('<div><img class="ui image mini circular"'
+				+ ' style="display: inline; width:47px;" src="'+ globalsVar.convImg[data.id] +'"></img>'
+				+ '<div class="ui compact message msg" style="margin-left: 5px;">'
+				+ data.msg + '</div></div>');
+			updateScroll('msg-display');
+		}
 	});
 
 	/*
 	** Notif.js
 	*/
 
-	socket.on('unlikeNotif', function() {
+	socket.on('unlikeNotif', function(resp) {
 		newNotif($('#notif-nbr'));
+		$('#notif > .menu').prepend('<div class="item">'+ resp.content +'</div>')
 	});
 
-	socket.on('likeNotif', function() {
+	socket.on('likeNotif', function(resp) {
 		newNotif($('#notif-nbr'));
+		$('#notif > .menu').prepend('<div class="item">'+ resp.content +'</div>')
 	});
 
-	socket.on('watchNotif', function() {
+	socket.on('watchNotif', function(resp) {
 		newNotif($('#notif-nbr'));
+		$('#notif > .menu').prepend('<div class="item">'+ resp.content +'</div>')
 	});
 
-	socket.on('messageNotif', function() {
+	socket.on('messageNotif', function(resp) {
 		newNotif($('#notif-nbr'));
+		$('#notif > .menu').prepend('<div class="item">'+ resp.content +'</div>')
 	});
 
-	var getNbrNotifNotRead = function() {
+	var getNbrNotifNotRead = function(resp) {
 		$.ajax({
 			type : 'post',
 			url : '/notif',
@@ -988,29 +1213,19 @@ $(document).ready(function(){
 			dataType : 'json',
 			encode : true
 		}).done(function (response){
-			if (response.status == 'success')
-				$('#notif-nbr').text(response.data);
+			if (response.status == 'success'){
+				$('#notif-nbr').text(response.data.nbr);
+				var $newNotif = $('#notif > .menu');
+				for (var i = 0; i < response.data.content.length; i++) {
+					$newNotif.prepend('<div class="item">'+ response.data.content[i].content +'</div>')
+				}
+			}
 		}).always(function (){});
 	}
 
 	var buildDropDownNotif = function() {
 		var $notif = $('#notif');
-		$.ajax({
-			type : 'post',
-			url : '/getNotif',
-			data : {del: false},
-			dataType : 'json',
-			encode : true
-		}).done(function (response){
-			if (response.status == 'success') {
-				var $newNotif = $('#notif > .menu');
-				$newNotif.empty();
-				for (var i = 0; i < response.data.length; i++) {
-					$newNotif.prepend('<div class="item">'+ response.data[i].content +'</div>')
-				}
-			}
-			
-		}).always(function (){});
+
 		$notif.off('click').on('click', function() {
 			$.ajax({
 				type : 'post',
@@ -1019,18 +1234,10 @@ $(document).ready(function(){
 				dataType : 'json',
 				encode : true
 			}).done(function (response){
-				if (response.status == 'success') {
-					var $newNotif = $('#notif > .menu');
-					$newNotif.empty();
-					for (var i = 0; i < response.data.length; i++) {
-						$newNotif.prepend('<div class="item">'+ response.data[i].content +'</div>')
-					}
+				if (response.status == 'success')
 					$('#notif-nbr').text('');
-				}
-				
 			}).always(function (){});
 		});
-		
 	}
 
 	/*
@@ -1077,7 +1284,10 @@ $(document).ready(function(){
 	};
 
 	var acceuilPage = function() {
+		getDataProfiles();
 		buildModalsContent();
+		triProfiles();
+		filterProfiles();
 	};
 
 	var messagesPage = function() {
@@ -1088,7 +1298,8 @@ $(document).ready(function(){
 	var runAllJs = function() {
 		globalsVar = { tags: [], userTags: [],
 			profileId: 0, matchId: [], talkWith: 0,
-			convImg: {} };
+			convImg: {}, lat: null, lng: null,
+			profiles: [], profilesFiltered: [] };
 		getNbrNotifNotRead();
 		buildDropDownNotif();
 		var page = $('.active-page').attr('page');

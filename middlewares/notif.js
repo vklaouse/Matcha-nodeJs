@@ -5,13 +5,14 @@ module.exports = {
 		var query = `SELECT * FROM notif WHERE user_id=$(uId)`;
 		req.db.many(query, req.session)
 		.then((resp) => {
+			console.log(resp)
 			var data = {
 				status : 'success',
-				data : Object.keys(resp).length
+				data : {nbr: Object.keys(resp).length, 
+					content: resp}
 			};
 			res.send(data);
 		}).catch((err) => {
-			console.log(err)
 			var data = {
 				status : 'fail',
 				data : 'no-notifs'
@@ -20,19 +21,15 @@ module.exports = {
 		});
 	},
 	getNotif: (req, res) => {
-		var query = `SELECT content FROM notif WHERE user_id=$(uId)`;
-		req.db.many(query, req.session)
+		var query = `DELETE FROM notif WHERE user_id=$(uId)`;
+		req.db.none(query, req.session)
 		.then((resp) => {
 			var data = {
 				status : 'success',
-				data : resp
+				data : {}
 			};
-			query = `DELETE FROM notif WHERE user_id=$(uId)`;
-			if (req.body.del)
-				req.db.none(query, req.session);
 			res.send(data);
 		}).catch((err) => {
-			console.log(err)
 			var data = {
 				status : 'fail',
 				data : 'no-notifs'
