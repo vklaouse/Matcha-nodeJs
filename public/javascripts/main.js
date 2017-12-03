@@ -972,6 +972,7 @@ $(document).ready(function(){
 
 	var triProfiles = function() {
 		$('#tri-age').off('click').on('click', function() {
+			globalsVar.fMode = "age";
 			globalsVar.profilesFiltered.sort(sortByAge);
 			$('.del').remove();
 			for (var i = 0; i < globalsVar.profilesFiltered.length; i++) {
@@ -981,6 +982,7 @@ $(document).ready(function(){
 		});
 
 		$('#tri-dist').off('click').on('click', function() {
+			globalsVar.fMode = "dist";
 			globalsVar.profilesFiltered.sort(sortByDist);
 			$('.del').remove();
 			for (var i = 0; i < globalsVar.profilesFiltered.length; i++) {
@@ -990,6 +992,7 @@ $(document).ready(function(){
 		});
 
 		$('#tri-pop').off('click').on('click', function() {
+			globalsVar.fMode = "pop";
 			globalsVar.profilesFiltered.sort(sortByPop);
 			$('.del').remove();
 			for (var i = 0; i < globalsVar.profilesFiltered.length; i++) {
@@ -999,6 +1002,7 @@ $(document).ready(function(){
 		});
 
 		$('#tri-tags').off('click').on('click', function() {
+			globalsVar.fMode = "tag";
 			globalsVar.profilesFiltered.sort(sortByTags);
 			$('.del').remove();
 			for (var i = 0; i < globalsVar.profilesFiltered.length; i++) {
@@ -1012,74 +1016,158 @@ $(document).ready(function(){
 		var minAge;
 		$('#min-age').off('keyup').on('keyup', function() {
 			clearTimeout(minAge);
+			$this = $(this);
 			minAge = setTimeout(function() {
-				console.log('#min-age');
+				if (parseInt($this.val()) && parseInt($this.val()) > -1)
+					globalsVar.filtersStates.minAge = parseInt($this.val());
+				else if (parseInt($this.val()) == 0)
+					globalsVar.filtersStates.minAge = 0;
+				else 
+					globalsVar.filtersStates.minAge = -1;
+				buildProfilesFilteredSuggestions(globalsVar.filtersStates);
 			}, 250);
 		});
 		var maxAge;
 		$('#max-age').off('keyup').on('keyup', function() {
 			clearTimeout(maxAge);
+			$this = $(this);
 			maxAge = setTimeout(function() {
-				console.log('#max-age');
+				if (parseInt($this.val()) && parseInt($this.val()) > -1)
+					globalsVar.filtersStates.maxAge = parseInt($this.val());
+				else if (parseInt($this.val()) == 0)
+					globalsVar.filtersStates.maxAge = 0;
+				else
+					globalsVar.filtersStates.maxAge = -1;
+				buildProfilesFilteredSuggestions(globalsVar.filtersStates);
 			}, 250);
 		});
 
 		var minDist;
 		$('#min-dist').off('keyup').on('keyup', function() {
 			clearTimeout(minDist);
+			$this = $(this);
 			minDist = setTimeout(function() {
-				console.log('#min-dist');
+				if (parseInt($this.val()) && parseInt($this.val()) > -1)
+					globalsVar.filtersStates.minDist = parseInt($this.val());
+				else if (parseInt($this.val()) == 0)
+					globalsVar.filtersStates.minDist = 0;
+				else
+					globalsVar.filtersStates.minDist = -1;
+				buildProfilesFilteredSuggestions(globalsVar.filtersStates);
 			}, 250);
 		});
 		var maxDist;
 		$('#max-dist').off('keyup').on('keyup', function() {
 			clearTimeout(maxDist);
+			$this = $(this);
 			maxDist = setTimeout(function() {
-				console.log('#max-dist');
+				if (parseInt($this.val()) && parseInt($this.val()) > -1)
+					globalsVar.filtersStates.maxDist = parseInt($this.val());
+				else if (parseInt($this.val()) == 0)
+					globalsVar.filtersStates.maxDist = 0;
+				else
+					globalsVar.filtersStates.maxDist = -1;
+				buildProfilesFilteredSuggestions(globalsVar.filtersStates);
 			}, 250);
 		});
 
 		var minPop;
 		$('#min-pop').off('keyup').on('keyup', function() {
 			clearTimeout(minPop);
+			$this = $(this);
 			minPop = setTimeout(function() {
-				console.log('#min-pop');
+				if (parseInt($this.val()) && parseInt($this.val()) > -1)
+					globalsVar.filtersStates.minPop = parseInt($this.val());
+				else if (parseInt($this.val()) == 0)
+					globalsVar.filtersStates.minPop = 0;
+				else
+					globalsVar.filtersStates.minPop = -1;
+				buildProfilesFilteredSuggestions(globalsVar.filtersStates);
 			}, 250);
 		});
 		var maxPop;
 		$('#max-pop').off('keyup').on('keyup', function() {
 			clearTimeout(maxPop);
+			$this = $(this);
 			maxPop = setTimeout(function() {
-				console.log('#max-pop');
+				if (parseInt($this.val()) && parseInt($this.val()) > -1)
+					globalsVar.filtersStates.maxPop = parseInt($this.val());
+				else if (parseInt($this.val()) == 0)
+					globalsVar.filtersStates.maxPop = 0;
+				else
+					globalsVar.filtersStates.maxPop = -1;
+				buildProfilesFilteredSuggestions(globalsVar.filtersStates);
 			}, 250);
 		});
 
 		var minTag;
 		$('#min-tag').off('keyup').on('keyup', function() {
 			clearTimeout(minTag);
+			$this = $(this);
 			minTag = setTimeout(function() {
-				console.log('#min-tag');
+				if (parseInt($this.val()) && parseInt($this.val()) > -1)
+					globalsVar.filtersStates.minTag = parseInt($this.val());
+				else if (parseInt($this.val()) == 0)
+					globalsVar.filtersStates.minTag = 0;
+				else
+					globalsVar.filtersStates.minTag = -1;
+				buildProfilesFilteredSuggestions(globalsVar.filtersStates);
 			}, 250);
 		});
 		var maxTag;
 		$('#max-tag').off('keyup').on('keyup', function() {
 			clearTimeout(maxTag);
+			$this = $(this);
 			maxTag = setTimeout(function() {
-				console.log('#max-tag');
+				if (parseInt($this.val()) && parseInt($this.val()) > -1)
+					globalsVar.filtersStates.maxTag = parseInt($this.val());
+				else if (parseInt($this.val()) == 0)
+					globalsVar.filtersStates.maxTag = 0;
+				else
+					globalsVar.filtersStates.maxTag = -1;
+
+				buildProfilesFilteredSuggestions(globalsVar.filtersStates);
 			}, 250);
 		});
 	}
 
-	var typingTimer;
-		$('#add-tag').off('keyup').on('keyup', function(e){
-			var $this = $(this);
-			$this.removeClass('input-error-out-form');
-			clearTimeout(typingTimer);
-			if (e.keyCode == 13)
-				registerTags($this);
-			else
-				typingTimer = setTimeout(function() {searchTags($this);}, 250);
-		});
+	var buildProfilesFilteredSuggestions = function(fStates) {
+		$('.del').remove();
+		globalsVar.profilesFiltered = [];
+		for (var i = 0; i < globalsVar.profiles.length; i++) {
+			var q = 0;
+			var w = 0;
+			var e = 0;
+			var r = 0;
+			if ((parseInt(globalsVar.profiles[i].age) >= fStates.minAge || fStates.minAge == -1) 
+				&& (parseInt(globalsVar.profiles[i].age) <= fStates.maxAge || fStates.maxAge == -1))
+				q = 1;
+			if ((Math.round(parseFloat(globalsVar.profiles[i].loc)) >= fStates.minDist || fStates.minDist == -1) 
+				&& (Math.round(parseFloat(globalsVar.profiles[i].loc)) <= fStates.maxDist || fStates.maxDist == -1))
+				w = 1;
+			if ((parseInt(globalsVar.profiles[i].pop) >= fStates.minPop || fStates.minPop == -1) 
+				&& (parseInt(globalsVar.profiles[i].pop) <= fStates.maxPop || fStates.maxPop == -1))
+				e = 1;
+			if ((globalsVar.profiles[i].tag.length >= fStates.minTag || fStates.minTag == -1) 
+				&& (globalsVar.profiles[i].tag.length <= fStates.maxTag || fStates.maxTag == -1))
+				r = 1;
+			if (q == 1 && w == 1 && e == 1 && r == 1)
+				globalsVar.profilesFiltered.push(globalsVar.profiles[i]);
+		}
+		if (globalsVar.fMode == "age")
+			globalsVar.profilesFiltered.sort(sortByAge);
+		else if (globalsVar.fMode == "dist")
+			globalsVar.profilesFiltered.sort(sortByDist);
+		else if (globalsVar.fMode == "pop")
+			globalsVar.profilesFiltered.sort(sortByPop);
+		else if (globalsVar.fMode == "tag")
+			globalsVar.profilesFiltered.sort(sortByTags);
+		for (var i = 0; i < globalsVar.profilesFiltered.length; i++) {
+			constructHome(globalsVar.profilesFiltered[i]);
+		}
+		buildModalsContent();
+	}
+
 
 	/*
 	** Messages.js
@@ -1299,7 +1387,12 @@ $(document).ready(function(){
 		globalsVar = { tags: [], userTags: [],
 			profileId: 0, matchId: [], talkWith: 0,
 			convImg: {}, lat: null, lng: null,
-			profiles: [], profilesFiltered: [] };
+			profiles: [], profilesFiltered: [],
+			filtersStates: {minAge: -1, maxAge: -1,
+				minDist: -1, maxDist: -1,
+				minPop: -1, maxPop: -1,
+				minTag: -1, maxTag: -1 }, fMode: null,
+			};
 		getNbrNotifNotRead();
 		buildDropDownNotif();
 		var page = $('.active-page').attr('page');

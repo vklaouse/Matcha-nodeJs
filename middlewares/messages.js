@@ -38,7 +38,32 @@ module.exports = {
 				}
 		return discussion;
 	},
+	getBlock: (block, match) => {
+		var matchs = [];
+		for (var i = 0; i < match.length; i++) {
+			for (var j = 0; j < block.length; j++) {
+				if (match[i] == block[j].user_id || match[i] == block[j].block_for)
+					break ;
+				else if (j == block.length - 1)
+					matchs.push(match[i]);
+			}
+		}
+		if (block.length == 0)
+			matchs = match;
+		return matchs;
+	},
 	messages: (req, res) => {
+		var query = `SELECT * FROM users_block WHERE user_id=$(uId) 
+					OR block_for=$(uId)`;
+		req.db.many(query, req.session)
+		.then((data) => {
+			module.exports.message(req, res, data);
+		}).catch((err) => {
+			module.exports.message(req, res, []);
+		});
+	},
+	message: (req, res, block) => {
+
 		var query = `SELECT * FROM likes WHERE user_id=$(uId) 
 					OR like_for=$(uId)`;
 		var matchs = [];
@@ -46,6 +71,7 @@ module.exports = {
 		req.db.many(query, req.session)
 		.then((data) => {
 			matchs = module.exports.getMatch(data, req.session.uId);
+			matchs = module.exports.getBlock(block, matchs);
 			query = `SELECT id, login, NULL as path_img, NULL as user_id_img FROM users WHERE id IN `;
 			query = query + module.exports.buildStrWithIds(matchs);
 			query = query + `UNION ALL SELECT NULL, NULL , path, user_id FROM images WHERE main=TRUE AND user_id IN `;
@@ -55,11 +81,10 @@ module.exports = {
 				discussion = module.exports.buildObjectMessageButton(data);
 				res.render('messages', {discussion: discussion, page: 'messages'});
 			}).catch((err) => {
-				console.log(err)
 				res.render('messages', {discussion: discussion, page: 'messages'});
 			});
 		}).catch((err) => {
-			console.log(err)
+			// console.log(err)
 			res.render('messages', {discussion: discussion, page: 'messages'});
 		});
 	},

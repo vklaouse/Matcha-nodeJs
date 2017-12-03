@@ -5,7 +5,6 @@ module.exports = {
 		var query = `SELECT * FROM notif WHERE user_id=$(uId)`;
 		req.db.many(query, req.session)
 		.then((resp) => {
-			console.log(resp)
 			var data = {
 				status : 'success',
 				data : {nbr: Object.keys(resp).length, 
